@@ -204,6 +204,27 @@
       await Store.deleteUser(studentUid);
     },
 
+    /* ── STEP 05(메신저): 대화 상대 목록 ──
+       - 교사 → 본인이 가르치는 학생 전원
+       - 학생 → 승인된 교사 (기본 관리자 계정 제외)
+       ※ listStudents/listTeachers 는 권한 제한이 있어 학생이 호출할 수 없으므로
+         메신저 상대 조회는 이 메서드를 사용한다. */
+    async listContacts() {
+      if (!this.user) throw new Error('로그인이 필요합니다.');
+      const all = await Store.getAllUsers();
+      if (this.user.role === 'teacher') {
+        return all
+          .filter((u) => u.role === 'student')
+          .sort((a, b) => a.loginId.localeCompare(b.loginId))
+          .map(stripPw);
+      }
+      // 학생: 승인된 교사만 (관리자 본 계정은 제외)
+      return all
+        .filter((u) => u.role === 'teacher' && u.status === 'approved' && !u.isRootAdmin)
+        .sort((a, b) => (a.name || a.loginId).localeCompare(b.name || b.loginId))
+        .map(stripPw);
+    },
+
     /* ── 교사 전용: 학생 목록 ── */
     async listStudents() {
       requireTeacher();

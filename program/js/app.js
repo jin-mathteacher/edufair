@@ -71,6 +71,7 @@
      로그인 화면
   ============================================================ */
   function showLogin() {
+    if (window.Messenger) Messenger.teardown(); // 알림 구독·배지 정리
     startScreen.classList.add('hidden');
     appShell.classList.add('hidden');
     loginScreen.classList.remove('hidden');
@@ -170,6 +171,9 @@
     settingsBtn.classList.toggle('hidden', user.role !== 'teacher');
     adminBtn.classList.toggle('hidden', !user.isAdmin);
 
+    // 메신저 알림 배지 구독 시작 (화면 이동과 무관하게 동작)
+    if (window.Messenger) Messenger.initNotifications(user);
+
     navigate('dashboard');
 
     // 첫 로그인이면 즉시 비밀번호 변경 유도, 아니면 학생 복습 퀴즈 팝업
@@ -237,6 +241,8 @@
       Dashboard.render(viewContainer, Auth.user);
     } else if (viewKey === 'scheduler' && window.Scheduler) {
       Scheduler.render(viewContainer, Auth.user);
+    } else if (viewKey === 'messenger' && window.Messenger) {
+      Messenger.render(viewContainer, Auth.user);
     } else {
       viewContainer.innerHTML = renderPlaceholder(viewKey, view);
     }
@@ -616,5 +622,5 @@
   /* 전역 노출 */
   window.App = { navigate, VIEWS, start, showLogin };
 
-  console.log('[app] STEP 04 로드 완료 — 스케줄러/대시보드 라우팅 연결됨');
+  console.log('[app] STEP 05 로드 완료 — 메신저/스케줄러/대시보드 라우팅 연결됨');
 })();

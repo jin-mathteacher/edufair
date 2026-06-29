@@ -176,4 +176,20 @@ program/
 7. 시나리오: 수업→평가→메신저→과제
 
 ---
+
+## 12. 메신저 푸시 알림
+
+**Level A (구현됨 · STEP 05)** — 앱이 켜져 있는 동안 새 메시지를 **OS 알림 배너**로 표시.
+- Web Notifications API(페이지 컨텍스트)만 사용 → **서버·서비스워커·과금 불필요**.
+- 기존 `inbox/{uid}` 실시간 구독의 델타(안읽음 증가)로 발화. 메신저 헤더 🔔 토글로 권한 요청(자동 프롬프트 금지).
+- 자기 메시지·현재 보고 있는 대화는 알림 제외. **HTTPS/localhost 필요**(`file://` 차단), Firebase 연결 시에만 동작.
+
+**Level B (미구현 · 향후 확장)** — 앱을 **완전히 닫아도** 푸시. 대회 제출본 범위 밖(백엔드·과금 필요).
+1. Firebase 콘솔: Cloud Messaging 활성화 + **VAPID 키** 발급, **Blaze(유료) 플랜** 전환.
+2. `index.html`에 `firebase-messaging-compat.js` 추가 + 도메인 루트에 **`firebase-messaging-sw.js`** 생성.
+3. 클라이언트: 권한 요청 → `getToken({vapidKey})` → 토큰을 `/users/{uid}/fcmTokens/{token}=true` 저장. 포그라운드 `onMessage`, 백그라운드 SW `onBackgroundMessage`.
+4. **Cloud Functions**: `messages/{threadId}/{msgId}` `onCreate` 트리거 → 수신자(`to`) 토큰 조회 → `admin.messaging().send()`. `firebase deploy --only functions`.
+5. Safari/iOS는 16.4+ & **홈화면 추가(PWA)** 필요 → `manifest.webmanifest` 권장.
+
+---
 > 상세 본문: `개발계획서.html` / 전체 계획: `~/.claude/plans/c-users-user-desktop-pdf-dl-snoopy-church.md`
