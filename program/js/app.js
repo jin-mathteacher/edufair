@@ -235,6 +235,8 @@
     // STEP 03부터: 구현된 화면은 전용 렌더러 호출, 미구현은 플레이스홀더
     if (viewKey === 'dashboard' && window.Dashboard) {
       Dashboard.render(viewContainer, Auth.user);
+    } else if (viewKey === 'scheduler' && window.Scheduler) {
+      Scheduler.render(viewContainer, Auth.user);
     } else {
       viewContainer.innerHTML = renderPlaceholder(viewKey, view);
     }
@@ -614,5 +616,5 @@
   /* 전역 노출 */
   window.App = { navigate, VIEWS, start, showLogin };
 
-  console.log('[app] STEP 03 로드 완료 — 대시보드 라우팅 연결됨');
+  console.log('[app] STEP 04 로드 완료 — 스케줄러/대시보드 라우팅 연결됨');
 })();
