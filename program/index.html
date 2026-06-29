@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <!-- XLSX.js — 학생 엑셀 일괄등록/템플릿 (Apache-2.0) -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- Chart.js — 대시보드 핵심역량 레이더 차트 (MIT) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
 <!-- 프로젝트 스타일 -->
 <link rel="stylesheet" href="css/style.css">
@@ -150,7 +152,10 @@
 
     <!-- 메뉴 (확정 순서: 스케줄러 → 메신저 → 학습실 → 질문방 → 기타 → 포트폴리오) -->
     <nav class="flex-1 overflow-y-auto py-3" id="nav-menu">
-      <button class="nav-item active" data-view="scheduler">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">🏠</span><span class="nav-text sidebar-label">대시보드</span>
+      </button>
+      <button class="nav-item" data-view="scheduler">
         <span class="nav-icon">📅</span><span class="nav-text sidebar-label">스케줄러</span>
       </button>
       <button class="nav-item" data-view="messenger">
@@ -173,7 +178,7 @@
     <!-- 하단 사용자 영역 -->
     <div class="px-4 py-3 border-t border-slate-700/60 shrink-0">
       <p id="sidebar-user" class="text-xs text-slate-300 font-semibold sidebar-label truncate">-</p>
-      <p class="text-[11px] text-slate-500 sidebar-label">v1.0 · STEP 02</p>
+      <p class="text-[11px] text-slate-500 sidebar-label">v1.0 · STEP 03</p>
     </div>
   </aside>
 
@@ -236,6 +241,7 @@
 <!-- ===== 프로젝트 스크립트 ===== -->
 <script src="js/firebase.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

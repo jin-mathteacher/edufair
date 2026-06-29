@@ -137,6 +137,11 @@
       }
       if (u.pwHash !== hash(password)) throw new Error('비밀번호가 올바르지 않습니다.');
 
+      // 접속 활동 기록 (STEP 03 대시보드 접속 현황용)
+      u.lastSeenAt = Date.now();
+      u.visits = (u.visits || 0) + 1;
+      await Store.saveUser(u);
+
       localStorage.setItem(LS_SESSION, uid);
       this.user = stripPw(u);
       if (typeof this.onLogin === 'function') this.onLogin(this.user);
@@ -315,6 +320,25 @@
       }
       const teacher = (await Store.getAllUsers()).find((u) => u.role === 'teacher' && u.apiKey);
       return teacher ? teacher.apiKey : '';
+    },
+
+    /* ── STEP 03: 현재 사용자 레코드 조회 (비밀번호 제외) ── */
+    async getMyData() {
+      if (!this.user) return null;
+      const u = await Store.getUser(this.user.uid);
+      return u ? stripPw(u) : null;
+    },
+
+    /* ── STEP 03: 현재 사용자 일부 필드 갱신 (역량·복습 기록 등) ──
+       patch 예) { competency: {...}, reviewQuiz: {...} } */
+    async saveMyData(patch) {
+      if (!this.user) throw new Error('로그인이 필요합니다.');
+      const u = await Store.getUser(this.user.uid);
+      if (!u) throw new Error('사용자를 찾을 수 없습니다.');
+      Object.assign(u, patch || {});
+      await Store.saveUser(u);
+      this.user = stripPw(u);
+      return this.user;
     }
   };
 

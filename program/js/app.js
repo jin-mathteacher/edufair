@@ -9,6 +9,7 @@
 
   /* ───── 메뉴 정의 (roles: 표시 권한) ───── */
   const VIEWS = {
+    dashboard: { title: '대시보드', icon: '🏠', desc: '반별 현황 · 접속 상태 · 학습 분석', roles: ['teacher', 'student'] },
     scheduler: { title: '스케줄러', icon: '📅', desc: '달력 · 일정 · 투두리스트 (교사 → 학생 일정 공유)', roles: ['teacher', 'student'] },
     messenger: { title: '메신저',   icon: '💬', desc: '교사 ↔ 학생 실시간 1:1 채팅', roles: ['teacher', 'student'] },
     lesson:    { title: '학습실',   icon: '📚', desc: '교과 수업 / 협업의 장 / 과제방', roles: ['teacher', 'student'] },
@@ -169,10 +170,11 @@
     settingsBtn.classList.toggle('hidden', user.role !== 'teacher');
     adminBtn.classList.toggle('hidden', !user.isAdmin);
 
-    navigate('scheduler');
+    navigate('dashboard');
 
-    // 첫 로그인이면 즉시 비밀번호 변경 유도
+    // 첫 로그인이면 즉시 비밀번호 변경 유도, 아니면 학생 복습 퀴즈 팝업
     if (user.mustChangePw) openPasswordModal(true);
+    else if (window.Dashboard) Dashboard.maybeShowReviewQuiz(user);
   }
 
   function renderUserInfo(user) {
@@ -229,7 +231,13 @@
     navMenu.querySelectorAll('.nav-item').forEach((el) =>
       el.classList.toggle('active', el.dataset.view === viewKey));
     viewTitle.textContent = view.title;
-    viewContainer.innerHTML = renderPlaceholder(viewKey, view);
+
+    // STEP 03부터: 구현된 화면은 전용 렌더러 호출, 미구현은 플레이스홀더
+    if (viewKey === 'dashboard' && window.Dashboard) {
+      Dashboard.render(viewContainer, Auth.user);
+    } else {
+      viewContainer.innerHTML = renderPlaceholder(viewKey, view);
+    }
   }
 
   function renderPlaceholder(key, view) {
@@ -293,6 +301,8 @@
         closeModal();
         renderUserInfo(user);
         alert('비밀번호가 변경되었습니다.');
+        // 첫 로그인 강제변경이었던 학생은 이어서 복습 퀴즈 안내
+        if (forced && window.Dashboard) Dashboard.maybeShowReviewQuiz(user);
       } catch (ex) { err.textContent = ex.message; }
     });
   }
@@ -604,5 +614,5 @@
   /* 전역 노출 */
   window.App = { navigate, VIEWS, start, showLogin };
 
-  console.log('[app] STEP 02 로드 완료 — 로그인/권한/설정 준비됨');
+  console.log('[app] STEP 03 로드 완료 — 대시보드 라우팅 연결됨');
 })();

@@ -397,3 +397,110 @@ html, body { margin: 0; height: 100%; }
 /* 학생 목록 */
 .student-list { max-height: 320px; overflow: auto; }
 .student-list th { font-weight: 600; }
+
+/* ============================================================
+   STEP 03 — 대시보드
+============================================================ */
+.dash-loading { padding: 60px 0; text-align: center; color: #94a3b8; }
+.dash-wrap { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.dash-hello { font-size: 18px; color: #1e293b; }
+.dash-hello .dash-sub { font-size: 13px; color: #94a3b8; margin-left: 8px; font-weight: 500; }
+.dash-title { font-size: 15px; font-weight: 800; color: #1e293b; margin: 0 0 14px; }
+.dash-note { font-size: 12px; color: #94a3b8; margin-top: 10px; }
+.dash-empty { text-align: center; color: #64748b; padding: 32px; }
+.dash-empty-sm { text-align: center; color: #94a3b8; font-size: 13px; padding: 28px 8px; line-height: 1.7; }
+
+/* 2단 컬럼 (좁아지면 1단) */
+.dash-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 900px) { .dash-cols { grid-template-columns: 1fr; } }
+
+/* 요약 통계 카드 */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+.stat-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 18px;
+  transition: box-shadow .15s, transform .15s;
+}
+.stat-card:hover { box-shadow: 0 8px 22px rgba(30,64,175,.08); transform: translateY(-2px); }
+.stat-icon {
+  width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px;
+  display: grid; place-items: center; font-size: 22px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+.stat-label { font-size: 12px; color: #94a3b8; font-weight: 600; margin: 0; }
+.stat-value { font-size: 22px; font-weight: 900; color: #1e293b; margin: 1px 0; line-height: 1.1; }
+.stat-sub { font-size: 11px; color: #94a3b8; margin: 0; }
+
+/* 표 */
+.dash-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+.dash-table th { text-align: left; color: #94a3b8; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+.dash-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+.dash-table .num { text-align: center; }
+.dash-table .mono { font-family: ui-monospace, Menlo, Consolas, monospace; color: #475569; }
+.dash-scroll { max-height: 340px; overflow: auto; }
+
+/* 접속 점 */
+.dot-on, .dot-off { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.dot-on { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.18); }
+.dot-off { background: #cbd5e1; }
+
+/* 복습 응시 배지 */
+.pill-ok { font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; padding: 2px 8px; border-radius: 999px; }
+.pill-no { font-size: 11px; font-weight: 700; color: #94a3b8; background: #f1f5f9; padding: 2px 8px; border-radius: 999px; }
+
+/* 진행바 */
+.pbar { position: relative; height: 18px; background: #f1f5f9; border-radius: 999px; overflow: hidden; min-width: 90px; }
+.pbar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border-radius: 999px; transition: width .4s ease; }
+.pbar-txt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #1e293b; }
+
+/* 레이더 차트 컨테이너 (높이 고정) */
+.radar-box { position: relative; height: 260px; }
+
+/* 미제출 과제 경고 배너 */
+.alert-banner {
+  background: linear-gradient(100deg, #fff7ed, #ffedd5);
+  border: 1px solid #fdba74; color: #9a3412;
+  border-radius: 12px; padding: 13px 18px; font-weight: 700; font-size: 14px;
+  animation: bannerPulse 2s ease-in-out infinite;
+}
+.alert-banner .alert-sub { display: block; font-weight: 500; font-size: 12px; color: #c2410c; margin-top: 3px; }
+@keyframes bannerPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(251,146,60,.0); }
+  50%     { box-shadow: 0 0 0 4px rgba(251,146,60,.18); }
+}
+
+/* 학생 할 일 미니 목록 */
+.todo-mini { list-style: none; padding: 0; margin: 12px 0 0; font-size: 13px; }
+.todo-mini li { padding: 4px 0; color: #334155; }
+.todo-mini li.done { color: #94a3b8; text-decoration: line-through; }
+
+/* ───── 복습 퀴즈 모달 ───── */
+.quiz-box { max-width: 460px; }
+.quiz-head { display: flex; align-items: center; justify-content: space-between; }
+.quiz-step { font-size: 12px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 3px 10px; border-radius: 999px; }
+.quiz-q { font-size: 16px; font-weight: 700; color: #1e293b; margin: 6px 0 16px; line-height: 1.5; }
+.quiz-choices { display: flex; flex-direction: column; gap: 9px; }
+.quiz-choice {
+  text-align: left; padding: 12px 15px; border: 1.5px solid #e2e8f0; border-radius: 11px;
+  background: #fff; font-size: 14px; color: #334155; cursor: pointer; transition: all .12s;
+}
+.quiz-choice:hover { border-color: #93c5fd; background: #f8fafc; }
+.quiz-choice.sel { border-color: #2563eb; background: #eff6ff; color: #1e40af; font-weight: 700; }
+.quiz-nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 18px; }
+.quiz-nav .btn-ghost:disabled, .quiz-nav .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+/* 퀴즈 결과 */
+.quiz-result { text-align: center; padding: 10px 0; }
+.quiz-score-ring {
+  --p: 0;
+  width: 130px; height: 130px; margin: 6px auto 14px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(closest-side, #fff 72%, transparent 73%),
+              conic-gradient(#2563eb calc(var(--p) * 1%), #e2e8f0 0);
+}
+.quiz-score-ring span { font-size: 32px; font-weight: 900; color: #1e293b; }
+.quiz-score-ring small { font-size: 14px; font-weight: 700; color: #94a3b8; margin-left: 2px; }
+.quiz-result-msg { font-size: 15px; font-weight: 700; color: #1e293b; margin: 4px 0; }
+.quiz-weak { font-size: 13px; color: #64748b; margin-top: 6px; }
+.quiz-weak b { color: #c2410c; }
