@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수학 교육 통합 플랫폼 개발 계획서 v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1e40af;--pl:#3b82f6;--accent:#0ea5e9;
+  --green:#16a34a;--orange:#d97706;--red:#dc2626;--purple:#7c3aed;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;--g900:#0f172a;
+}
+body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#fff;color:var(--g800);font-size:10pt;line-height:1.7}
+@page{size:A4;margin:14mm 17mm 14mm 17mm}
+@media print{
+  .no-print{display:none!important}
+  .pb{page-break-before:always}
+  body{font-size:9pt}
+  .cover{min-height:100vh}
+}
+
+/* ── 표지 ── */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#0c4a6e 100%);
+  color:#fff;text-align:center;padding:50px 36px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 80%,rgba(99,102,241,.12) 0%,transparent 50%),
+             radial-gradient(circle at 80% 20%,rgba(14,165,233,.1) 0%,transparent 50%)}
+.ci{position:relative;z-index:1;max-width:680px;width:100%}
+.cbadge{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:50px;padding:5px 18px;font-size:8.5pt;letter-spacing:.8px;margin-bottom:28px;color:#93c5fd}
+.cover h1{font-size:24pt;font-weight:900;line-height:1.25;margin-bottom:10px;letter-spacing:-.5px}
+.cover h1 span{color:#60a5fa}
+.cover .sub{font-size:11.5pt;color:#93c5fd;margin-bottom:10px;font-weight:300}
+.cover .ver{display:inline-block;background:rgba(99,102,241,.3);border:1px solid rgba(99,102,241,.4);
+  border-radius:6px;padding:3px 12px;font-size:8pt;color:#c4b5fd;margin-bottom:40px}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:40px}
+.ccard{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 12px}
+.ccard .cl{font-size:7pt;color:#93c5fd;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
+.ccard .cv{font-size:9.5pt;font-weight:700;color:#fff}
+.cdiv{width:50px;height:3px;background:linear-gradient(90deg,#3b82f6,#0ea5e9);margin:0 auto 16px;border-radius:2px}
+.cmeta{font-size:8.5pt;color:#475569}
+
+/* ── 본문 공통 ── */
+.doc{padding:0 2px}
+.ph{padding:28px 0 0;margin-bottom:4px}
+.ph .chap{font-size:7.5pt;color:var(--g500);text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:7px;display:flex;align-items:center;gap:10px}
+.ph .chap::after{content:'';flex:1;height:1px;background:var(--g200)}
+.sec{padding:20px 0 14px;border-bottom:1px solid var(--g200);margin-bottom:20px}
+.snum{display:inline-block;background:var(--primary);color:#fff;font-size:7.5pt;font-weight:700;
+  padding:3px 10px;border-radius:4px;margin-bottom:7px;letter-spacing:.8px}
+.sec h2{font-size:15pt;font-weight:800;color:var(--g900);letter-spacing:-.3px}
+.sec p{color:var(--g600);margin-top:5px;font-size:9pt}
+h3{font-size:10.5pt;font-weight:700;color:var(--g800);margin:20px 0 10px;padding-left:10px;border-left:3px solid var(--pl)}
+h4{font-size:9.5pt;font-weight:700;color:var(--primary);margin:13px 0 7px}
+p{margin-bottom:8px;color:var(--g700)}
+ul,ol{padding-left:18px;margin-bottom:10px}
+li{margin-bottom:3px;color:var(--g700);font-size:9.5pt}
+strong{color:var(--g900)}
+code{background:var(--g100);border:1px solid var(--g200);border-radius:4px;padding:1px 5px;font-size:8pt;font-family:'Courier New',monospace;color:var(--purple)}
+
+/* ── 카드 ── */
+.card{background:var(--g50);border:1px solid var(--g200);border-radius:9px;padding:15px 17px;margin-bottom:12px}
+.card-blue{background:#eff6ff;border-color:#bfdbfe}
+.card-green{background:#f0fdf4;border-color:#bbf7d0}
+.card-purple{background:#f5f3ff;border-color:#ddd6fe}
+.card-orange{background:#fff7ed;border-color:#fed7aa}
+.card-red{background:#fef2f2;border-color:#fecaca}
+
+/* ── 알림 ── */
+.alert{border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.ai{font-size:14pt;flex-shrink:0;line-height:1.2}
+.alert-d{background:#fef2f2;border-left:4px solid var(--red)}
+.alert-s{background:#f0fdf4;border-left:4px solid var(--green)}
+.alert-w{background:#fffbeb;border-left:4px solid var(--orange)}
+.alert-i{background:#eff6ff;border-left:4px solid var(--primary)}
+.alert-p{background:#f5f3ff;border-left:4px solid var(--purple)}
+.alert strong{display:block;margin-bottom:3px;font-size:9.5pt}
+.alert p{margin:0;font-size:8.5pt}
+
+/* ── 표 ── */
+table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:8.5pt}
+thead th{background:var(--g800);color:#fff;padding:9px 11px;text-align:left;font-weight:600;font-size:8pt}
+tbody td{padding:8px 11px;border-bottom:1px solid var(--g200);color:var(--g700);vertical-align:top}
+tbody tr:nth-child(even) td{background:var(--g50)}
+
+/* ── 배지 ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:50px;font-size:7pt;font-weight:700;white-space:nowrap}
+.br{background:#fef2f2;color:var(--red)}
+.bg{background:#f0fdf4;color:var(--green)}
+.bo{background:#fff7ed;color:var(--orange)}
+.bb{background:#eff6ff;color:var(--primary)}
+.bp{background:#f5f3ff;color:var(--purple)}
+.bgr{background:var(--g100);color:var(--g600)}
+
+/* ── 아키텍처 다이어그램 ── */
+.arch{background:var(--g900);color:#e2e8f0;border-radius:11px;padding:24px;font-family:'Courier New',monospace;font-size:8pt;line-height:1.8;margin-bottom:16px}
+.arch .at{color:#60a5fa;font-weight:700;margin-bottom:8px;font-size:9pt}
+.al{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:12px 16px;margin:8px 0}
+.al .alt{color:#93c5fd;font-size:7pt;margin-bottom:6px;letter-spacing:.8px;text-transform:uppercase}
+.aitems{display:flex;gap:10px;flex-wrap:wrap}
+.aitem{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:5px;padding:4px 10px;color:#bfdbfe;font-size:7.5pt}
+.aitem.new{background:rgba(124,58,237,.2);border-color:rgba(124,58,237,.4);color:#c4b5fd}
+.aarrow{text-align:center;color:var(--g600);font-size:11pt;line-height:1.6;padding:2px 0}
+
+/* ── 폴더 트리 ── */
+.ftree{background:var(--g900);color:#e2e8f0;border-radius:10px;padding:22px;font-family:'Courier New',monospace;font-size:8pt;line-height:1.95}
+.ftree .fd{color:#60a5fa}
+.ftree .ff{color:#94a3b8}
+.ftree .fc{color:#475569}
+.ftree .fh{color:#34d399}
+.ftree .fn{color:#a78bfa}
+
+/* ── 스텝 타임라인 ── */
+.steps{position:relative;margin:16px 0}
+.step{display:grid;grid-template-columns:90px 14px 1fr;gap:0 14px;margin-bottom:0;align-items:start}
+.step-line{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;align-items:center}
+.step-dot{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--pl);background:var(--pl);flex-shrink:0;margin-top:3px}
+.step-dot.p1{background:var(--red);box-shadow:0 0 0 2px var(--red)}
+.step-dot.p2{background:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+.step-dot.p3{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+.step-dot.pnew{background:var(--purple);box-shadow:0 0 0 2px var(--purple)}
+.step-vline{width:2px;background:var(--g200);flex:1;min-height:20px}
+.step-num{text-align:right;padding-top:2px}
+.step-num .sn{display:inline-block;background:var(--primary);color:#fff;font-size:7pt;font-weight:700;padding:3px 8px;border-radius:4px}
+.step-num .sn.p1{background:var(--red)}
+.step-num .sn.p2{background:var(--orange)}
+.step-num .sn.p3{background:var(--green)}
+.step-num .sn.pnew{background:var(--purple)}
+.step-num .dur{font-size:7pt;color:var(--g500);margin-top:3px}
+.step-content{padding-bottom:18px}
+.step-content h4{font-size:9.5pt;margin:0 0 5px;color:var(--g900)}
+.step-content ul{margin:0;padding-left:15px}
+.step-content li{font-size:8.5pt;color:var(--g600);margin-bottom:2px}
+.step-content .ok{font-size:7.5pt;color:var(--green);margin-top:5px;font-weight:600}
+.step-content .ok::before{content:'✅ 완료 기준: '}
+
+/* ── 그리드 ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+
+/* ── 체크리스트 ── */
+.clist{list-style:none;padding:0}
+.clist li{padding:5px 0 5px 26px;position:relative;border-bottom:1px solid var(--g100);font-size:9pt}
+.clist li::before{content:'□';position:absolute;left:3px;color:var(--pl);font-size:11pt;line-height:1;top:5px}
+
+/* ── 목차 ── */
+.toc{background:var(--g50);border:1px solid var(--g200);border-radius:9px;padding:20px 24px;margin-bottom:26px}
+.toc h3{border:none;padding:0;margin:0 0 12px;font-size:11pt}
+.toc-list{list-style:none;padding:0}
+.toc-list li{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px dotted var(--g200);font-size:9pt;color:var(--g700)}
+.toc-list .tn{color:var(--primary);font-weight:700;min-width:24px}
+.toc-list .tp{color:var(--g300);font-size:8pt}
+
+/* ── 스케줄러 개요도 ── */
+.sch-flow{background:linear-gradient(135deg,#f5f3ff,#eff6ff);border:1px solid #ddd6fe;border-radius:11px;padding:20px 24px;margin-bottom:16px}
+.sch-boxes{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.sch-box{background:#fff;border:1.5px solid #c4b5fd;border-radius:8px;padding:10px 14px;text-align:center;min-width:100px}
+.sch-box .sb-icon{font-size:18pt;margin-bottom:4px}
+.sch-box .sb-title{font-size:8.5pt;font-weight:700;color:var(--purple)}
+.sch-box .sb-sub{font-size:7pt;color:var(--g500)}
+.sch-arrow{font-size:14pt;color:var(--purple);flex-shrink:0}
+.sch-box.teacher{border-color:#2563eb;background:#eff6ff}
+.sch-box.teacher .sb-title{color:#1d4ed8}
+.sch-box.student{border-color:#16a34a;background:#f0fdf4}
+.sch-box.student .sb-title{color:var(--green)}
+
+/* ── 메뉴 구조도 ── */
+.menu-tree{background:#fff;border:1.5px solid var(--g200);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.menu-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--g100)}
+.menu-item:last-child{border:none}
+.mi-num{width:22px;height:22px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7.5pt;font-weight:700;flex-shrink:0}
+.mi-num.new{background:var(--purple)}
+.mi-icon{font-size:14pt;width:24px;text-align:center}
+.mi-name{font-weight:700;font-size:9.5pt;color:var(--g800)}
+.mi-sub{font-size:8pt;color:var(--g500);margin-left:4px}
+.mi-badge{margin-left:auto}
+
+/* ── 기능 카드 ── */
+.fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.fc-item{border:1px solid var(--g200);border-radius:9px;padding:13px 15px;background:#fff}
+.fc-item .fi{font-size:18pt;margin-bottom:6px}
+.fc-item h4{font-size:9.5pt;margin:0 0 5px;color:var(--g800)}
+.fc-item p{font-size:8pt;margin:0;color:var(--g600);line-height:1.55}
+.fc-item .tags{margin-top:7px}
+.fc-item .tags span{display:inline-block;background:var(--g100);color:var(--g600);font-size:7pt;padding:2px 6px;border-radius:4px;margin:2px 2px 0 0}
+
+/* ── 스택 그리드 ── */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.si{background:#fff;border:1px solid var(--g200);border-radius:7px;padding:10px 12px}
+.si .sn{font-weight:700;font-size:9pt;color:var(--g800)}
+.si .sr{font-size:7.5pt;color:var(--g600)}
+.si .sl{font-size:7pt;color:var(--green);font-weight:600}
+
+/* ── 인쇄 버튼 ── */
+.pbtn{position:fixed;top:18px;right:18px;background:var(--primary);color:#fff;border:none;border-radius:8px;
+  padding:10px 22px;font-size:9.5pt;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(30,64,175,.4);z-index:1000;display:flex;align-items:center;gap:6px}
+.pbtn:hover{background:#1d4ed8}
+
+.hbox{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #bfdbfe;border-radius:9px;padding:15px 19px;margin-bottom:14px}
+.hbox h4{color:var(--primary);margin:0 0 7px}
+hr{border:none;border-top:1px solid var(--g200);margin:24px 0}
+.pn{text-align:center;color:var(--g300);font-size:7.5pt;padding:16px 0;border-top:1px solid var(--g100);margin-top:32px}
+.risk-g td{background:#f0fdf4!important}
+.risk-o td{background:#fffbeb!important}
+.risk-r td{background:#fef2f2!important}
+</style>
+</head>
+<body>
+
+<button class="pbtn no-print" onclick="window.print()">🖨️ PDF 저장</button>
+
+<!-- ══════════════════ 표지 ══════════════════ -->
+<div class="cover">
+<div class="ci">
+  <div class="cbadge">제20회 경기도교육청 디지털교육연구대회 · 교육용SW·AI분과</div>
+  <h1>수학 교육 <span>통합 플랫폼</span><br>개발 계획서</h1>
+  <div class="ver">Version 2.0 — 스케줄러 추가 · 단계별 개발 계획 반영</div>
+  <p class="sub">교사와 학생을 연결하는 AI 기반 수학 학습 생태계</p>
+  <div class="cgrid">
+    <div class="ccard"><div class="cl">출품 분과</div><div class="cv">교육용 SW·AI분과</div></div>
+    <div class="ccard"><div class="cl">적용 교과</div><div class="cv">수학</div></div>
+    <div class="ccard"><div class="cl">연구 대상</div><div class="cv">고등학교</div></div>
+    <div class="ccard"><div class="cl">백엔드</div><div class="cv">Firebase (무료)</div></div>
+    <div class="ccard"><div class="cl">AI 엔진</div><div class="cv">Claude API</div></div>
+    <div class="ccard"><div class="cl">개발 방식</div><div class="cv">단계별 완성 후 검수</div></div>
+  </div>
+  <div class="cdiv"></div>
+  <div class="cmeta">작성일: 2026년 6월 29일 &nbsp;|&nbsp; 제출 기한: 2026년 7월 23일 ~ 31일 &nbsp;|&nbsp; v2.0 스케줄러 추가</div>
+</div>
+</div>
+
+<div class="doc" style="padding:36px 18px 0">
+
+<!-- ══ 목차 ══ -->
+<div class="toc">
+  <h3>📋 목차</h3>
+  <ul class="toc-list">
+    <li><span><span class="tn">01</span> 프로젝트 개요 및 목적</span><span class="tp">2p</span></li>
+    <li><span><span class="tn">02</span> 전체 메뉴 구조</span><span class="tp">3p</span></li>
+    <li><span><span class="tn">03</span> 대회 요강 분석 · 심사 기준</span><span class="tp">4p</span></li>
+    <li><span><span class="tn">04</span> 기술 스택 · 시스템 아키텍처</span><span class="tp">5p</span></li>
+    <li><span><span class="tn">05</span> 시스템 폴더 구조</span><span class="tp">6p</span></li>
+    <li><span><span class="tn">06</span> ★ 스케줄러 · 달력 · 투두리스트 상세 설계</span><span class="tp">7p</span></li>
+    <li><span><span class="tn">07</span> 전체 기능 목록 (우선순위)</span><span class="tp">8p</span></li>
+    <li><span><span class="tn">08</span> 핵심 기능 상세 설계</span><span class="tp">9p</span></li>
+    <li><span><span class="tn">09</span> 구현 불가 기능 · 대체안</span><span class="tp">11p</span></li>
+    <li><span><span class="tn">10</span> ★ 단계별 개발 로드맵 (STEP 01~14)</span><span class="tp">12p</span></li>
+    <li><span><span class="tn">11</span> 심사 기준별 대응 전략</span><span class="tp">14p</span></li>
+    <li><span><span class="tn">12</span> 최종 제출 체크리스트</span><span class="tp">15p</span></li>
+  </ul>
+</div>
+
+<!-- ══════════ 01 개요 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 01</div></div>
+<div class="sec"><div class="snum">01</div><h2>프로젝트 개요 및 목적</h2><p>수업·메신저·스케줄러·평가·AI 멘토를 하나의 플랫폼에 통합한 수학 교육 생태계</p></div>
+
+<h3>1-1. 개발 배경 및 목표</h3>
+<div class="g2">
+  <div class="card card-blue">
+    <h4>🎯 현장의 문제</h4>
+    <p>수업·메신저·과제·일정 관리가 각각 다른 앱으로 분산되어 교사 업무 과중, 학습 데이터 파편화 발생</p>
+  </div>
+  <div class="card card-green">
+    <h4>💡 해결 방향</h4>
+    <p>하나의 로그인으로 모든 교수·학습 활동 통합. AI가 학생 개별 데이터를 분석해 맞춤형 피드백 제공</p>
+  </div>
+</div>
+
+<h3>1-2. 사용자 구분</h3>
+<table>
+  <thead><tr><th>구분</th><th>주요 역할</th><th>핵심 기능</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge bb">관리자 교사</span></td><td>학생 등록·반 관리·교사 권한 부여</td><td>전체 기능 + 학생 비밀번호 초기화</td></tr>
+    <tr><td><span class="badge bo">일반 교사</span></td><td>수업 설계·평가·일정 공유</td><td>스케줄러·메신저·수업·평가·과제·AI</td></tr>
+    <tr><td><span class="badge bg">학생</span></td><td>수업 참여·과제 제출·질문</td><td>배정 수업·스케줄러·메신저·AI 멘토</td></tr>
+  </tbody>
+</table>
+
+<h3>1-3. 핵심 가치</h3>
+<div class="g3">
+  <div class="card"><h4>📅 일정 통합</h4><p style="font-size:8.5pt">스케줄러·달력·투두리스트로 교사-학생 일정 공유</p></div>
+  <div class="card"><h4>🤖 AI 멘토링</h4><p style="font-size:8.5pt">소크라테스식 AI, 자동 채점, 역량 분석</p></div>
+  <div class="card"><h4>📱 완전 반응형</h4><p style="font-size:8.5pt">PC·태블릿·스마트폰, 터치 필기 지원</p></div>
+</div>
+
+<!-- ══════════ 02 메뉴 구조 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 02</div></div>
+<div class="sec"><div class="snum">02</div><h2>전체 메뉴 구조</h2><p>사이드바 메뉴 순서 및 하위 구성</p></div>
+
+<h3>2-1. 사이드바 메뉴 (확정 순서)</h3>
+<div class="menu-tree">
+  <div class="menu-item">
+    <div class="mi-num new">1</div>
+    <div class="mi-icon">📅</div>
+    <div>
+      <div class="mi-name">스케줄러 <span style="color:#7c3aed;font-size:8pt">★ NEW</span></div>
+      <div class="mi-sub">달력 · 일정 관리 · 투두리스트 · 교사→학생 일정 공유</div>
+    </div>
+    <div class="mi-badge"><span class="badge bp">신규 추가</span></div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-num">2</div>
+    <div class="mi-icon">💬</div>
+    <div>
+      <div class="mi-name">메신저</div>
+      <div class="mi-sub">1:1 채팅 · 사진/카메라 업로드 · 질문 알림</div>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-num">3</div>
+    <div class="mi-icon">📚</div>
+    <div>
+      <div class="mi-name">학습실</div>
+      <div class="mi-sub">교과 수업 / 협업의 장(Co-Work) / 과제방</div>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-num">4</div>
+    <div class="mi-icon">🤖</div>
+    <div>
+      <div class="mi-name">질문방 (AI 챗봇)</div>
+      <div class="mi-sub">수학자 캐릭터 AI 멘토 · 공개 질문 · 포인트/뱃지</div>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-num">5</div>
+    <div class="mi-icon">🛠️</div>
+    <div>
+      <div class="mi-name">기타</div>
+      <div class="mi-sub">바이브코딩 · 수학그림 작성기</div>
+    </div>
+  </div>
+  <div class="menu-item">
+    <div class="mi-num">6</div>
+    <div class="mi-icon">🏆</div>
+    <div>
+      <div class="mi-name">포트폴리오</div>
+      <div class="mi-sub">학습 현황 · 뱃지 · AI 관찰 기록 · PDF 출력</div>
+    </div>
+  </div>
+</div>
+
+<h3>2-2. 학습실 하위 구조</h3>
+<div class="g3">
+  <div class="card card-blue">
+    <h4>📖 교과 수업</h4>
+    <ul style="font-size:8.5pt">
+      <li>개념기반 학습</li>
+      <li>수업노트 (터치 필기)</li>
+      <li>유튜브 / 임베디드</li>
+      <li>평가 (다양한 유형)</li>
+      <li>수업 복사 기능</li>
+    </ul>
+  </div>
+  <div class="card card-purple">
+    <h4>🤝 협업의 장</h4>
+    <ul style="font-size:8.5pt">
+      <li>가상 화이트보드</li>
+      <li>모둠 배분·모니터링</li>
+      <li>게이미피케이션 대전</li>
+    </ul>
+  </div>
+  <div class="card card-orange">
+    <h4>📋 과제방</h4>
+    <ul style="font-size:8.5pt">
+      <li>과제 등록·제출</li>
+      <li>메신저 자동 알림</li>
+      <li>AI 사진 채점</li>
+      <li>투두리스트 연동</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════ 03 요강 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 03</div></div>
+<div class="sec"><div class="snum">03</div><h2>대회 요강 분석 · 심사 기준</h2></div>
+
+<div class="alert alert-w">
+  <div class="ai">⚠️</div>
+  <div><strong>index.html 단독 실행의 함정 — Firebase로 해결</strong>
+  <p>요강 원문: "웹 애플리케이션의 경우 <strong>소프트웨어 운영에 필요한 서버 환경을 보고서에 기재</strong>". 서버 없이 실행해야 한다는 규정이 아닙니다. Firebase를 백엔드로 사용하면 실시간 메신저·수업 동기화·AI 챗봇 모두 심사 현장에서 실제 동작합니다.</p></div>
+</div>
+
+<h3>3-1. 심사 기준 100점</h3>
+<table>
+  <thead><tr><th>영역</th><th>배점</th><th>세부 기준</th><th>우리의 대응</th></tr></thead>
+  <tbody>
+    <tr><td><strong>연구목적 독창성</strong></td><td style="text-align:center"><strong>20</strong></td><td>기존 SW와 차별화, 역량 향상</td><td>AI 소크라테스 멘토, 스케줄러 일정 공유, 수학 역량 레이더</td></tr>
+    <tr><td><strong>학습내용 타당성</strong></td><td style="text-align:center"><strong>10</strong></td><td>교육과정 연계, 체계적 구성</td><td>수학 5대 핵심역량 자동 분류, 개정교육과정 반영</td></tr>
+    <tr><td><strong>구현기술 안정성</strong></td><td style="text-align:center"><strong>10</strong></td><td>오류 없이 안정 구동</td><td>Firebase + 단계별 오류 검수, 14단계 완성 방식</td></tr>
+    <tr><td><strong>소프트웨어 우수성</strong></td><td style="text-align:center"><strong>10</strong></td><td>학습 동기 유발, 효율 인터페이스</td><td>게이미피케이션, 실시간 투표, 뱃지 시스템</td></tr>
+    <tr><td><strong>수업활용 체계성</strong></td><td style="text-align:center"><strong>10</strong></td><td>실제 수업 적용 과정 제시</td><td>실제 수업 적용 + 결과 데이터 보고서 포함</td></tr>
+    <tr><td><strong>교수학습 효율성</strong></td><td style="text-align:center"><strong>10</strong></td><td>교실 적합 인터페이스</td><td>1:9 레이아웃, 교사→학생 화면 실시간 동기화</td></tr>
+    <tr><td><strong>일반화 가능성</strong></td><td style="text-align:center"><strong>20</strong></td><td>타 학교·교사 적용 가능</td><td>SaaS 구조, Firebase로 모든 학교 즉시 사용 가능</td></tr>
+    <tr><td><strong>시사성</strong></td><td style="text-align:center"><strong>10</strong></td><td>구체적 시사점 도출</td><td>다문화 번역, 포트폴리오 자동 생성, 교사 업무 경감</td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════ 04 기술 스택 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 04</div></div>
+<div class="sec"><div class="snum">04</div><h2>기술 스택 · 시스템 아키텍처</h2></div>
+
+<h3>4-1. 최종 기술 스택</h3>
+<div class="sg">
+  <div class="si"><div class="sn">HTML5 / CSS3</div><div class="sr">프론트엔드 마크업</div><div class="sl">✅ 웹 표준</div></div>
+  <div class="si"><div class="sn">Vanilla JavaScript</div><div class="sr">앱 로직 / 라우팅</div><div class="sl">✅ 웹 표준</div></div>
+  <div class="si"><div class="sn">Tailwind CSS CDN</div><div class="sr">스타일링 유틸리티</div><div class="sl">✅ MIT</div></div>
+  <div class="si"><div class="sn">Firebase Auth</div><div class="sr">로그인 · 인증</div><div class="sl">✅ 무료 플랜</div></div>
+  <div class="si"><div class="sn">Firebase Realtime DB</div><div class="sr">실시간 메신저·동기화</div><div class="sl">✅ 무료 1GB</div></div>
+  <div class="si"><div class="sn">Firebase Storage</div><div class="sr">사진·PDF 업로드</div><div class="sl">✅ 무료 5GB</div></div>
+  <div class="si" style="border-color:#ddd6fe"><div class="sn" style="color:#7c3aed">FullCalendar.js</div><div class="sr">달력·스케줄러 UI ★NEW</div><div class="sl">✅ MIT</div></div>
+  <div class="si"><div class="sn">Claude API</div><div class="sr">AI 챗봇·채점·분석</div><div class="sl">⚙️ 교사 키 입력</div></div>
+  <div class="si"><div class="sn">Chart.js</div><div class="sr">레이더 차트·통계</div><div class="sl">✅ MIT</div></div>
+  <div class="si"><div class="sn">PDF.js (Mozilla)</div><div class="sr">PDF 렌더링</div><div class="sl">✅ Apache 2.0</div></div>
+  <div class="si"><div class="sn">XLSX.js</div><div class="sr">엑셀 학생명단 파싱</div><div class="sl">✅ Apache 2.0</div></div>
+  <div class="si"><div class="sn">Fabric.js</div><div class="sr">화이트보드·캔버스</div><div class="sl">✅ MIT</div></div>
+</div>
+
+<h3>4-2. 시스템 아키텍처</h3>
+<div class="arch">
+  <div class="at">▶ 전체 시스템 구조</div>
+  <div class="al">
+    <div class="alt">🖥️ FRONTEND — index.html (브라우저에서 즉시 실행)</div>
+    <div class="aitems">
+      <div class="aitem">로그인/인증</div>
+      <div class="aitem new">📅 스케줄러+달력+투두</div>
+      <div class="aitem">메신저</div>
+      <div class="aitem">대시보드</div>
+      <div class="aitem">교과수업</div>
+      <div class="aitem">평가시스템</div>
+      <div class="aitem">AI 챗봇</div>
+      <div class="aitem">과제방</div>
+      <div class="aitem">포트폴리오</div>
+    </div>
+  </div>
+  <div class="aarrow">⬇ Firebase SDK (CDN 1줄) ⬆</div>
+  <div class="al">
+    <div class="alt">☁️ BACKEND — Google Firebase (Spark 무료 플랜)</div>
+    <div class="aitems">
+      <div class="aitem">Authentication<br><span style="font-size:7pt;color:#64748b">교사/학생 로그인</span></div>
+      <div class="aitem new">Realtime DB<br><span style="font-size:7pt;color:#94a3b8">스케줄러·메신저·동기화</span></div>
+      <div class="aitem">Storage<br><span style="font-size:7pt;color:#64748b">사진·PDF 5GB</span></div>
+      <div class="aitem">Hosting<br><span style="font-size:7pt;color:#64748b">HTTPS 자동</span></div>
+    </div>
+  </div>
+  <div class="aarrow">⬇ HTTPS API 호출 ⬆</div>
+  <div class="al">
+    <div class="alt">🤖 AI — Claude API (교사 설정 화면에서 API 키 직접 입력)</div>
+    <div class="aitems">
+      <div class="aitem">AI 챗봇 멘토</div>
+      <div class="aitem">서술형 자동 채점</div>
+      <div class="aitem">PDF 문제 파싱</div>
+      <div class="aitem">과제 사진 분석</div>
+      <div class="aitem">학습 분석 리포트</div>
+      <div class="aitem">수학 그림 생성</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ 05 폴더 구조 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 05</div></div>
+<div class="sec"><div class="snum">05</div><h2>시스템 폴더 구조</h2></div>
+
+<div class="ftree">
+<span class="fd">📁 제출_USB/</span>
+├── <span class="fd">📁 document/</span>           <span class="fc"># 필수 제출 서류</span>
+│   ├── <span class="ff">연구보고서.hwp / .pdf</span>
+│   ├── <span class="ff">연구보고서_블라인드.hwp / .pdf</span>
+│   └── <span class="ff">작품명-[번호].jpg</span>    <span class="fc"># 주요화면 캡처 (1024×768↑)</span>
+├── <span class="fd">📁 media/</span> <span class="fd">image/</span> · <span class="fd">sound/</span> · <span class="fd">movie/</span>
+│
+├── <span class="fd">📁 program/</span>              <span class="fc"># ★ 심사관 실행 폴더</span>
+│   ├── <span class="fh">index.html</span>           <span class="fc"># 시작파일 (제목+학년 명시)</span>
+│   ├── <span class="fd">📁 css/</span>
+│   │   └── <span class="ff">style.css</span>
+│   ├── <span class="fd">📁 js/</span>
+│   │   ├── <span class="ff">app.js</span>           <span class="fc"># 라우터·전역 상태</span>
+│   │   ├── <span class="ff">firebase.js</span>      <span class="fc"># Firebase 초기화</span>
+│   │   ├── <span class="ff">auth.js</span>          <span class="fc"># 로그인·권한</span>
+│   │   ├── <span class="ff">dashboard.js</span>
+│   │   ├── <span class="fn">scheduler.js</span>     <span class="fc"># ★ NEW 스케줄러+달력+투두</span>
+│   │   ├── <span class="ff">messenger.js</span>
+│   │   ├── <span class="ff">lesson.js</span>
+│   │   ├── <span class="ff">assessment.js</span>
+│   │   ├── <span class="ff">homework.js</span>
+│   │   ├── <span class="ff">chatbot.js</span>
+│   │   ├── <span class="ff">collab.js</span>
+│   │   ├── <span class="ff">portfolio.js</span>
+│   │   ├── <span class="ff">mathsketch.js</span>
+│   │   └── <span class="ff">ai.js</span>
+│   └── <span class="fd">📁 assets/</span>
+│       ├── <span class="fd">characters/</span>      <span class="fc"># 수학자 SVG</span>
+│       └── <span class="fd">icons/</span>
+│
+└── <span class="fd">📁 source/</span>               <span class="fc"># program 폴더 동일 복사</span>
+</div>
+
+<!-- ══════════ 06 스케줄러 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 06</div></div>
+<div class="sec"><div class="snum">06</div><h2>★ 스케줄러 · 달력 · 투두리스트 상세 설계</h2><p>신규 추가 기능 — 메신저 위 첫 번째 메뉴</p></div>
+
+<div class="alert alert-p">
+  <div class="ai">📅</div>
+  <div><strong>핵심 개념: 교사가 일정을 공유하면 학생 달력에 자동 저장</strong>
+  <p>교사가 스케줄러에 일정을 등록하고 "학생에게 보내기" 를 누르면, 선택한 반 전체 학생의 달력에 해당 일정이 Firebase를 통해 즉시 저장됩니다. 학생은 로그인하면 교사 일정을 바로 확인할 수 있습니다.</p></div>
+</div>
+
+<h3>6-1. 교사→학생 일정 공유 흐름</h3>
+<div class="sch-flow">
+  <h4 style="color:#7c3aed;margin-bottom:10px">📋 일정 공유 전체 흐름</h4>
+  <div class="sch-boxes">
+    <div class="sch-box teacher">
+      <div class="sb-icon">👩‍🏫</div>
+      <div class="sb-title">교사 스케줄러</div>
+      <div class="sb-sub">일정 제목·날짜·메모<br>대상 반 선택</div>
+    </div>
+    <div class="sch-arrow">→</div>
+    <div class="sch-box">
+      <div class="sb-icon">🔘</div>
+      <div class="sb-title">학생에게 보내기</div>
+      <div class="sb-sub">버튼 클릭</div>
+    </div>
+    <div class="sch-arrow">→</div>
+    <div class="sch-box" style="border-color:#f97316">
+      <div class="sb-icon">🔥</div>
+      <div class="sb-title">Firebase DB</div>
+      <div class="sb-sub">반별 학생 전원<br>자동 저장</div>
+    </div>
+    <div class="sch-arrow">→</div>
+    <div class="sch-box student">
+      <div class="sb-icon">👨‍🎓</div>
+      <div class="sb-title">학생 달력</div>
+      <div class="sb-sub">파란색 일정으로<br>자동 표시</div>
+    </div>
+  </div>
+  <p style="font-size:8.5pt;color:#6d28d9;margin:0">※ 학생은 교사 발송 일정 삭제 불가 (열람만 가능) · 학생 개인 일정은 본인만 열람</p>
+</div>
+
+<h3>6-2. 달력 (Calendar)</h3>
+<div class="g2">
+  <div class="card card-purple">
+    <h4>교사용 달력</h4>
+    <ul style="font-size:8.5pt">
+      <li>월간·주간·일간 뷰 전환</li>
+      <li>일정 등록: 제목·날짜·시간·색상·메모·대상반</li>
+      <li><strong>"학생에게 보내기"</strong> 버튼 → 선택 반 즉시 공유</li>
+      <li>반 전체 달력 모니터링 가능</li>
+      <li>수업 일정·평가 일정·공지 색상 구분</li>
+    </ul>
+  </div>
+  <div class="card card-green">
+    <h4>학생용 달력</h4>
+    <ul style="font-size:8.5pt">
+      <li>교사 공유 일정: 파란색 (삭제 불가)</li>
+      <li>과제 마감일: 주황색 (과제방 자동 연동)</li>
+      <li>개인 일정: 회색 (본인만 열람·편집)</li>
+      <li>일정 클릭 → 상세 내용 팝업</li>
+      <li>미래 일정 알림 표시</li>
+    </ul>
+  </div>
+</div>
+<div class="alert alert-i">
+  <div class="ai">📌</div>
+  <div><strong>FullCalendar.js 사용 (MIT 라이선스, CDN)</strong>
+  <p>드래그&드롭 일정 이동, 다중 뷰(월간/주간/일간), 반응형 지원. Firebase Realtime DB와 연동하여 교사가 일정 추가 시 학생 달력에 실시간 반영.</p></div>
+</div>
+
+<h3>6-3. 투두리스트 (Todo List)</h3>
+<div class="g2">
+  <div class="card">
+    <h4>달력 우측 사이드패널</h4>
+    <ul style="font-size:8.5pt">
+      <li>날짜 클릭 → 해당 날짜의 할 일 목록 표시</li>
+      <li>체크 완료 시 취소선 + Firebase 저장 (기기 간 동기화)</li>
+      <li>드래그 앤 드롭으로 날짜 간 이동</li>
+      <li>우선순위 설정 (높음·보통·낮음)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>자동 연동</h4>
+    <ul style="font-size:8.5pt">
+      <li>과제방 과제 등록 → 학생 투두리스트 자동 추가 🟠</li>
+      <li>교사 일정 공유 → 학생 투두리스트 자동 추가 🔵</li>
+      <li>수업 시작 알림 → 당일 투두에 표시</li>
+      <li>완료율 대시보드에 표시</li>
+    </ul>
+  </div>
+</div>
+
+<h3>6-4. Firebase 데이터 구조</h3>
+<div class="arch" style="padding:18px 22px">
+<span style="color:#60a5fa">// 스케줄러 DB 구조</span>
+/schedules/<span style="color:#34d399">{userId}</span>/events/<span style="color:#34d399">{eventId}</span>/
+  ├── title: "중간고사 범위 안내"
+  ├── date: "2026-07-10"
+  ├── time: "09:00"
+  ├── color: "#3b82f6"         <span style="color:#475569">// 파란색 = 교사 공유</span>
+  ├── memo: "3단원 전체 범위"
+  ├── isFromTeacher: true
+  ├── classId: "1-7"           <span style="color:#475569">// 공유 대상 반</span>
+  └── createdAt: timestamp
+
+/todos/<span style="color:#34d399">{userId}</span>/<span style="color:#34d399">{date}</span>/<span style="color:#34d399">{todoId}</span>/
+  ├── text: "수학 3단원 복습"
+  ├── done: false
+  ├── priority: "high"
+  └── source: "teacher"        <span style="color:#475569">// manual | homework | teacher</span>
+</div>
+
+<!-- ══════════ 07 기능 목록 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 07</div></div>
+<div class="sec"><div class="snum">07</div><h2>전체 기능 목록 (우선순위)</h2></div>
+
+<table>
+  <thead><tr><th>STEP</th><th>기능명</th><th>사용자</th><th>Firebase</th><th>AI</th><th>우선순위</th></tr></thead>
+  <tbody>
+    <tr><td>01</td><td>Firebase 환경 + index.html 뼈대 + 1:9 레이아웃</td><td>공통</td><td>초기화</td><td>-</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>02</td><td>로그인·권한 분기·학생 엑셀 일괄 등록</td><td>공통</td><td>Auth+DB</td><td>-</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>03</td><td>대시보드 (반별 현황·접속·AI 분석)</td><td>공통</td><td>Realtime DB</td><td>분석</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr style="background:#f5f3ff"><td>04</td><td><strong>★ 스케줄러·달력·투두리스트·교사→학생 공유</strong></td><td>공통</td><td>Realtime DB</td><td>-</td><td><span class="badge bp">P1 신규</span></td></tr>
+    <tr><td>05</td><td>실시간 메신저 (사진·카메라·읽음 표시·알림)</td><td>공통</td><td>Realtime DB</td><td>-</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>06</td><td>교과 수업 생성·열람·수업 복사 기능</td><td>공통</td><td>Realtime DB</td><td>-</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>07</td><td>수업노트 (Canvas 터치 필기·PDF 업로드·PDF 출력)</td><td>공통</td><td>Storage</td><td>-</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>08</td><td>평가 시스템 (다양한 유형·자동채점·역량 레이더)</td><td>공통</td><td>Realtime DB</td><td>서술형 채점</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>09</td><td>과제방 (제출·현황·AI 사진 분석·투두 연동)</td><td>공통</td><td>Realtime DB</td><td>Vision</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>10</td><td>AI 챗봇 (수학자 캐릭터·소크라테스식·그래프)</td><td>공통</td><td>-</td><td>Claude API</td><td><span class="badge br">P1 필수</span></td></tr>
+    <tr><td>11</td><td>협업 화이트보드·게이미피케이션 대전 모드</td><td>공통</td><td>Realtime DB</td><td>-</td><td><span class="badge bo">P2 중요</span></td></tr>
+    <tr><td>12</td><td>포트폴리오·뱃지·AI 관찰 기록·PDF 출력</td><td>학생</td><td>Realtime DB</td><td>기록 생성</td><td><span class="badge bo">P2 중요</span></td></tr>
+    <tr><td>13</td><td>수학 그림 작성기·바이브코딩·다국어 번역</td><td>교사</td><td>-</td><td>Claude Vision</td><td><span class="badge bg">P3 추가</span></td></tr>
+    <tr><td>14</td><td>전체 통합 테스트·블라인드 검수·제출 준비</td><td>-</td><td>-</td><td>-</td><td><span class="badge br">최종</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════ 08 핵심 기능 설계 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 08</div></div>
+<div class="sec"><div class="snum">08</div><h2>핵심 기능 상세 설계</h2></div>
+
+<h3>8-1. 인증 시스템</h3>
+<div class="g2">
+  <div class="card"><h4>교사 계정</h4>
+    <ul style="font-size:8.5pt">
+      <li>Firebase Auth 이메일 로그인</li>
+      <li>관리자가 일반 교사 등록·관리</li>
+      <li>AI API 키 설정 메뉴</li>
+    </ul>
+  </div>
+  <div class="card"><h4>학생 계정</h4>
+    <ul style="font-size:8.5pt">
+      <li>엑셀 업로드 → 일괄 생성 (XLSX.js)</li>
+      <li>아이디: 학년반번호 (예: 10701)</li>
+      <li>초기 비밀번호 = 아이디, 첫 로그인 시 변경 강제</li>
+      <li>교사가 비밀번호 초기화 가능</li>
+    </ul>
+  </div>
+</div>
+
+<h3>8-2. 메신저 기능</h3>
+<table>
+  <thead><tr><th>기능</th><th>구현 방법</th><th>동작</th></tr></thead>
+  <tbody>
+    <tr><td>1:1 실시간 채팅</td><td>Firebase onValue() 리스너</td><td><span class="badge bg">✅ 실제 동작</span></td></tr>
+    <tr><td>사진·카메라 업로드</td><td>Firebase Storage + getUserMedia()</td><td><span class="badge bg">✅ HTTPS 동작</span></td></tr>
+    <tr><td>메시지 읽음 표시</td><td>Firebase DB read_at 필드</td><td><span class="badge bg">✅ 실제 동작</span></td></tr>
+    <tr><td>알림 배지</td><td>onValue() 미읽음 카운트</td><td><span class="badge bg">✅ 실제 동작</span></td></tr>
+    <tr><td>수업 질문→페이지 연계</td><td>슬라이드 번호 메시지 첨부</td><td><span class="badge bg">✅ 실제 동작</span></td></tr>
+    <tr><td>유의미 질문 체크 (교사전용)</td><td>teacher_marked 필드 (학생 비공개)</td><td><span class="badge bg">✅ 실제 동작</span></td></tr>
+  </tbody>
+</table>
+
+<h3>8-3. 평가 시스템</h3>
+<div class="fc-grid">
+  <div class="fc-item"><div class="fi">📝</div><h4>기본 유형</h4><p>객관식·다중선택·참/거짓·빈칸·서술형·지문형</p><div class="tags"><span>자동채점</span><span>터치 입력</span></div></div>
+  <div class="fc-item"><div class="fi">📐</div><h4>수학 전용</h4><p>수식 응답·그래프 작성·Canvas 풀이 필기 입력</p><div class="tags"><span>Canvas</span><span>math.js</span></div></div>
+  <div class="fc-item"><div class="fi">📊</div><h4>실시간 인터랙션</h4><p>워드 클라우드·막대그래프·투표 결과 즉시 표시</p><div class="tags"><span>Chart.js</span><span>Firebase</span></div></div>
+  <div class="fc-item"><div class="fi">🎯</div><h4>총괄평가</h4><p>하→중→상 단계·오답 시 동형 문제·기본 3문제</p><div class="tags"><span>AI 분류</span><span>레이더 차트</span></div></div>
+</div>
+
+<h3>8-4. 교과 수업 모듈</h3>
+<table>
+  <thead><tr><th>슬라이드 타입</th><th>주요 기능</th><th>AI</th></tr></thead>
+  <tbody>
+    <tr><td>개념기반 학습</td><td>개념·사실·호기심 탭, PDF 키워드 자동 추출</td><td>✅</td></tr>
+    <tr><td>수업노트</td><td>Canvas 터치 필기, 더블클릭 펜모드, PDF 내보내기</td><td>-</td></tr>
+    <tr><td>유튜브</td><td>URL 임베드, 교사 재생 시 학생 화면 동기화</td><td>-</td></tr>
+    <tr><td>외부 임베디드</td><td>임베드 불가 시 자동 감지 → 새 탭 안내</td><td>-</td></tr>
+    <tr><td>평가</td><td>PDF 업로드 → AI 파싱 → 문항 자동 생성</td><td>✅</td></tr>
+    <tr><td>수업 복사</td><td>수업 전체를 다른 반으로 복사 (체크박스 다중 선택)</td><td>-</td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════ 09 대체안 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 09</div></div>
+<div class="sec"><div class="snum">09</div><h2>구현 불가 기능 · 현실적 대체안</h2></div>
+
+<table>
+  <thead><tr><th>원래 기능</th><th>불가 이유</th><th>확정 대체안</th><th>동작</th></tr></thead>
+  <tbody>
+    <tr class="risk-g"><td>카카오톡 알림</td><td>공식 API 없음</td><td>앱 내 메신저 알림 완전 대체. 스케줄러·과제 등록 시 메신저 자동 발송</td><td><span class="badge bg">✅ 동작</span></td></tr>
+    <tr class="risk-g"><td>실시간 화면 동기화</td><td>WebSocket 서버 필요</td><td>Firebase Realtime DB onValue()로 대체. 교사 슬라이드 변경 즉시 반영</td><td><span class="badge bg">✅ 동작</span></td></tr>
+    <tr class="risk-g"><td>카메라 접근</td><td>file:// 차단</td><td>Firebase Hosting HTTPS 환경에서 getUserMedia() 정상 동작</td><td><span class="badge bg">✅ HTTPS</span></td></tr>
+    <tr class="risk-g"><td>외부 문제 DB</td><td>저작권</td><td>교사 전용 "문제 자료실" — 교사 PDF 업로드 → Claude API 파싱</td><td><span class="badge bg">✅ AI</span></td></tr>
+    <tr class="risk-g"><td>손필기 AI 채점</td><td>고급 OCR</td><td>Claude Vision API 사진 분석 + 교사 최종 확인</td><td><span class="badge bg">✅ AI</span></td></tr>
+    <tr class="risk-o"><td>외부 서비스 임베디드</td><td>X-Frame-Options</td><td>임베드 자동 감지 → 불가 시 교사 토스트 안내 + 학생 화면 [새 창 열기] 버튼</td><td><span class="badge bo">⚠️ 새 창</span></td></tr>
+    <tr class="risk-o"><td>Web Push 알림</td><td>HTTPS 전용</td><td>앱 내 알림 배지 + 경고음 (브라우저 탭 열림 시). Firebase onValue() 즉시 반응</td><td><span class="badge bo">⚠️ 탭 열림</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════ 10 로드맵 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 10</div></div>
+<div class="sec"><div class="snum">10</div><h2>★ 단계별 개발 로드맵 (STEP 01~14)</h2><p>하나씩 완성 → 오류 점검 → 이상 없으면 다음 단계 진행 / 제출 기한: 2026년 7월 31일</p></div>
+
+<div class="alert alert-s">
+  <div class="ai">✅</div>
+  <div><strong>개발 원칙: 완성→검수→다음 단계</strong>
+  <p>각 STEP을 완성한 후 완료 기준을 충족하면 다음 STEP으로 진행. 오류 발생 시 해당 STEP에서 해결 후 진행. 이전 STEP에 영향을 주는 수정은 해당 STEP으로 돌아가서 재검수.</p></div>
+</div>
+
+<div class="steps">
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 01</div><div class="dur">1~2일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>Firebase 환경 설정 + index.html 뼈대 + 1:9 레이아웃</h4>
+    <ul>
+      <li>Firebase 프로젝트 생성 (Auth·Realtime DB·Storage·Hosting)</li>
+      <li>index.html 기본 구조 (시작화면: 연구보고서 제목 + 대상학년 표시)</li>
+      <li>1:9 사이드바 레이아웃 (CSS Grid, 반응형)</li>
+      <li>사이드바 토글 (전체화면↔1:9) 구현</li>
+      <li>Tailwind CSS CDN 연결</li>
+    </ul>
+    <div class="ok">Chrome에서 1:9 레이아웃 정상 표시, 사이드바 토글 동작</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 02</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>인증 시스템 (로그인·권한·학생 일괄 등록)</h4>
+    <ul>
+      <li>Firebase Auth 이메일 로그인 구현</li>
+      <li>교사·학생 권한 분기 (Realtime DB role 필드)</li>
+      <li>학생 엑셀 파일 업로드 → XLSX.js 파싱 → Firebase 일괄 생성</li>
+      <li>첫 로그인 시 비밀번호 변경 강제 모달</li>
+      <li>교사의 학생 비밀번호 초기화 기능</li>
+    </ul>
+    <div class="ok">교사 로그인→교사 화면, 학생 로그인→학생 화면 분기 정상 동작</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 03</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>대시보드 (반별 현황·접속 상태·학습 분석)</h4>
+    <ul>
+      <li>교사: 반별 접속 현황, 학생별 학습 진도 현황판</li>
+      <li>학생: 오늘의 수업, 미제출 과제 경고 배너, 투두리스트 완료율</li>
+      <li>로그인 시 이전 학습 복습 퀴즈 팝업</li>
+      <li>Chart.js 수학 핵심역량 레이더 차트 기본 틀</li>
+    </ul>
+    <div class="ok">교사·학생 대시보드 데이터 Firebase에서 정상 로드·표시</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn pnew">STEP 04</div><div class="dur">3~4일</div></div>
+  <div class="step-line"><div class="step-dot pnew"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4 style="color:#7c3aed">★ 스케줄러 · 달력 · 투두리스트 (신규 기능)</h4>
+    <ul>
+      <li>FullCalendar.js CDN 연결 및 기본 달력 구현</li>
+      <li>교사: 일정 등록 폼 (제목·날짜·시간·색상·메모·대상반 선택)</li>
+      <li><strong>"학생에게 보내기"</strong> 버튼 → Firebase → 선택 반 학생 달력 자동 저장</li>
+      <li>학생: 교사 발송 일정 파란색 표시 (삭제 불가), 개인 일정 추가</li>
+      <li>달력 우측 투두리스트 패널 (날짜 클릭 시 해당 날 할 일 표시)</li>
+      <li>투두 완료 체크 → Firebase 저장 (기기 간 동기화)</li>
+      <li>과제방 과제 마감일 → 학생 투두리스트 자동 추가</li>
+    </ul>
+    <div class="ok">교사 일정 등록→보내기 클릭→학생 달력 즉시 반영, 투두 체크 기기 간 동기화</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 05</div><div class="dur">3~4일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>실시간 메신저</h4>
+    <ul>
+      <li>Firebase Realtime DB 기반 1:1 채팅 구현</li>
+      <li>사진 파일 업로드 (Firebase Storage)</li>
+      <li>카메라 촬영 업로드 (getUserMedia → Canvas 캡처)</li>
+      <li>메시지 읽음 시간 표시, 알림 배지 (미읽음 카운트)</li>
+      <li>수업 중 질문 → 현재 슬라이드 번호 자동 첨부</li>
+      <li>교사 전용: 유의미한 질문 체크 (학생 비공개)</li>
+    </ul>
+    <div class="ok">교사↔학생 실시간 메시지 송수신, 사진 업로드, 알림 배지 정상 동작</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 06</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>교과 수업 (생성·열람·복사·실시간 동기화)</h4>
+    <ul>
+      <li>교사: 수업 생성·반별 목록 관리, 슬라이드 타입 선택</li>
+      <li>수업 복사: 수업 전체를 다른 반에 복사 (체크박스 다중 선택)</li>
+      <li>학생: 자신의 반에 배정된 수업만 열람</li>
+      <li>교사 수업 시작 → Firebase → 학생 화면 자동 동기화</li>
+      <li>학생 화면 이탈 시 복귀 경고 (visibilitychange 이벤트)</li>
+    </ul>
+    <div class="ok">수업 생성·복사·학생 열람·화면 동기화 정상 동작</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 07</div><div class="dur">3~4일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>수업노트 (터치 필기 · PDF 슬라이드)</h4>
+    <ul>
+      <li>Canvas API + Pointer Events 터치 필기 (30fps 부드러운 입력)</li>
+      <li>더블클릭 → 펜모드 자동 전환, 화면 하단 고정 색상 메뉴</li>
+      <li>PDF.js로 PDF 슬라이드 렌더링 (최대 30장)</li>
+      <li>수업 내용 jsPDF로 PDF 저장·다운로드</li>
+    </ul>
+    <div class="ok">터치 필기 부드럽게 동작, PDF 슬라이드 렌더링, PDF 저장 정상</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 08</div><div class="dur">4~5일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>평가 시스템</h4>
+    <ul>
+      <li>평가 유형 구현 (객관식·서술형·수식 응답·드래그앤드롭 등)</li>
+      <li>AI 서술형 피드백 (Claude API, 맞춤법·문맥·키워드)</li>
+      <li>수학 핵심역량 분류 (문제해결·추론·의사소통·연결·정보처리)</li>
+      <li>정오각형 레이더 차트 결과 표시 (Chart.js)</li>
+      <li>총괄평가: 하→중→상 단계·동형 문제·풀이 시간 기록</li>
+      <li>친구 풀이 공유·코멘트 (교사 온/오프)</li>
+    </ul>
+    <div class="ok">다양한 유형 응시·채점·레이더 차트 표시, AI 피드백 응답 정상</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 09</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>과제방</h4>
+    <ul>
+      <li>과제 등록 → 메신저 알림 자동 발송 + 학생 투두리스트 자동 추가</li>
+      <li>제출 현황 교사 뷰, 기한 초과 시 경고음·경고 배너</li>
+      <li>사진 업로드 제출 (문제집·프린트 촬영)</li>
+      <li>Claude Vision API: 풀이 과정 확인 → 의심 학생 플래그</li>
+      <li>교사 최종 확인 인터페이스</li>
+    </ul>
+    <div class="ok">과제 등록→학생 알림·투두 연동, 사진 제출·AI 분석 정상</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 10</div><div class="dur">4~5일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>AI 챗봇 (소크라테스 수학자 멘토)</h4>
+    <ul>
+      <li>주제별 수학자 캐릭터 (뉴턴·가우스·오일러 등) CSS 애니메이션</li>
+      <li>Claude API + 소크라테스 프롬프트 (답 직접 제공 금지)</li>
+      <li>function-plot으로 동적 그래프 시각화</li>
+      <li>공개 질문방: 익명 처리·학생 답변·포인트·뱃지</li>
+      <li>교사: 요일별 학생 질문 열람 대시보드</li>
+    </ul>
+    <div class="ok">AI 대화 정상 응답, 그래프 표시, 공개 질문 익명 처리</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p2">STEP 11</div><div class="dur">3~4일</div></div>
+  <div class="step-line"><div class="step-dot p2"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>협업 화이트보드 + 게이미피케이션</h4>
+    <ul>
+      <li>Fabric.js 가상 칠판 (포스트잇·그림·사진 업로드)</li>
+      <li>모둠 배분·모니터링 기능</li>
+      <li>퀴즈 대전 모드 (기명/무기명·팀전·1번 도전)</li>
+      <li>카훗 스타일 실시간 점수판</li>
+    </ul>
+    <div class="ok">화이트보드 동시 편집, 대전 모드 점수 집계 정상</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p2">STEP 12</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p2"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>포트폴리오 · 뱃지 · AI 관찰 기록</h4>
+    <ul>
+      <li>접속 시간·수업 참여도·문제풀이 성공률 자동 기록</li>
+      <li>Claude API: 학생 성취수준 관찰 기록 자동 생성</li>
+      <li>뱃지 시스템 (문제풀이 성공·포인트 적립 연계)</li>
+      <li>포트폴리오 PDF 출력 (jsPDF)</li>
+    </ul>
+    <div class="ok">포트폴리오 생성, AI 관찰 기록, PDF 출력 정상</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p3">STEP 13</div><div class="dur">2~3일</div></div>
+  <div class="step-line"><div class="step-dot p3"></div><div class="step-vline"></div></div>
+  <div class="step-content">
+    <h4>기타 기능 (수학그림 작성기 · 바이브코딩 · 다국어)</h4>
+    <ul>
+      <li>수학그림 작성기: 손 스케치 → Claude Vision → SVG 삽화 / 문제→그래프 자동 생성</li>
+      <li>바이브코딩: 교사가 자연어로 미니 앱 생성·학생 배포</li>
+      <li>다국어 번역 (다문화 학생 지원)</li>
+      <li>로그인 시 복습 퀴즈 (AI 취약 개념 3문제)</li>
+    </ul>
+    <div class="ok">각 기능 독립적으로 정상 동작</div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num"><div class="sn p1">STEP 14</div><div class="dur">3~4일</div></div>
+  <div class="step-line"><div class="step-dot p1"></div></div>
+  <div class="step-content">
+    <h4>전체 통합 테스트 + 블라인드 검수 + 제출 준비</h4>
+    <ul>
+      <li>Chrome·Edge·Safari 교차 테스트</li>
+      <li>1920×1080·태블릿·모바일 반응형 확인</li>
+      <li>소스코드 전수 grep: 학교명·성명·지역명 0건 확인</li>
+      <li>USB 폴더 구조 구성 (document·media·program·source)</li>
+      <li>연구보고서 작성 (본문 10쪽, 요약서 2쪽)</li>
+      <li>주요 화면 캡처 (1024×768 이상 JPG)</li>
+    </ul>
+    <div class="ok">모든 기능 오류 0, 블라인드 확인 완료, USB 제출 준비 완료</div>
+  </div>
+</div>
+
+</div><!-- .steps -->
+
+<!-- ══════════ 11 심사 대응 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 11</div></div>
+<div class="sec"><div class="snum">11</div><h2>심사 기준별 대응 전략</h2></div>
+
+<table>
+  <thead><tr><th>심사 영역</th><th>배점</th><th>우리 프로그램의 강점</th></tr></thead>
+  <tbody>
+    <tr><td><strong>독창성</strong></td><td style="text-align:center">20</td><td>소크라테스 AI 멘토 + 스케줄러 일정 공유 + 수학자 캐릭터 — 기존 에듀테크에 없는 조합</td></tr>
+    <tr><td><strong>타당성</strong></td><td style="text-align:center">10</td><td>수학 5대 핵심역량 자동 분류, 개정교육과정 반영, 인지수준별 문제 분류</td></tr>
+    <tr><td><strong>안정성</strong></td><td style="text-align:center">10</td><td>Firebase 클라우드 + 14단계 단계별 완성·검수로 오류 최소화</td></tr>
+    <tr><td><strong>우수성</strong></td><td style="text-align:center">10</td><td>게이미피케이션 대전, 뱃지/포인트, 실시간 워드클라우드, 달력 투두 연동</td></tr>
+    <tr><td><strong>체계성</strong></td><td style="text-align:center">10</td><td>실제 수업 적용 → 결과 데이터 → 보고서 포함</td></tr>
+    <tr><td><strong>효율성</strong></td><td style="text-align:center">10</td><td>1:9 레이아웃, 스케줄러·메신저·수업 원스톱 관리</td></tr>
+    <tr><td><strong>일반화</strong></td><td style="text-align:center">20</td><td>Firebase SaaS — 어느 학교나 즉시 사용 가능, 교과 무관 범용 플랫폼</td></tr>
+    <tr><td><strong>시사성</strong></td><td style="text-align:center">10</td><td>스케줄러 일정 공유로 교사 업무 경감, 다문화 번역, AI 포트폴리오 자동 생성</td></tr>
+  </tbody>
+</table>
+
+<!-- ══════════ 12 체크리스트 ══════════ -->
+<div class="pb"></div>
+<div class="ph"><div class="chap">CHAPTER 12</div></div>
+<div class="sec"><div class="snum">12</div><h2>최종 제출 체크리스트</h2></div>
+
+<h3>소프트웨어 파일</h3>
+<ul class="clist">
+  <li><code>program/index.html</code> 브라우저에서 즉시 실행 확인</li>
+  <li>시작 화면에 연구보고서 제목 + 대상학년 표시</li>
+  <li>소스코드·UI·파일명 — 학교명·성명·지역명 <strong>0건</strong> (grep 확인)</li>
+  <li>Chrome·Edge·Safari 정상 동작, 1920×1080 레이아웃 확인</li>
+  <li><code>source/</code> = <code>program/</code> 동일 복사</li>
+</ul>
+
+<h3>연구보고서</h3>
+<ul class="clist">
+  <li>본문 10쪽 이내 / 요약서 2쪽 / 참고자료 10쪽 (총 22쪽)</li>
+  <li>전체 폰트 바탕체, 대제목 15pt</li>
+  <li>파일 4종: HWP·PDF (기재본) + 블라인드 HWP·PDF</li>
+  <li>인쇄본 6부 (5부 블라인드 + 1부 기재본), 흑백 양면</li>
+  <li>서버 환경 기재: Firebase Auth·Realtime DB·Storage·Hosting</li>
+  <li>AI 기재: Claude API (버전, 교사 키 입력 방식)</li>
+  <li>저작권 증빙: 모든 CDN 라이브러리 MIT/Apache 확인서</li>
+</ul>
+
+<h3>USB 구성</h3>
+<ul class="clist">
+  <li>USB 레이블 [서식 4-2] 편지봉투 겉면 부착</li>
+  <li>USB 속지 [서식 4-3] USB 본체 부착</li>
+  <li>멀티미디어 교육자료 목록 [서식 5] 작성 완료</li>
+  <li>주요 화면 캡처 JPG (1024×768 이상) document/ 포함</li>
+</ul>
+
+<div class="alert alert-d" style="margin-top:20px">
+  <div class="ai">🚨</div>
+  <div><strong>감점 요인 4가지 — 각 1점, 최대 4점 감점</strong>
+  <p>① 연구보고서 분량 초과 &nbsp;② 블라인드 미처리 &nbsp;③ 컬러인쇄본 제출 &nbsp;④ 지정 글꼴(바탕체) 미준수</p></div>
+</div>
+
+<div class="pn">수학 교육 통합 플랫폼 개발 계획서 v2.0 · 스케줄러+달력+투두리스트 추가 · 단계별 개발(STEP 01~14) · 2026.06.29</div>
+
+</div><!-- .doc -->
+</body>
+</html>

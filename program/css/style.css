@@ -1,0 +1,399 @@
+/* ============================================================
+   수학 교육 통합 플랫폼 — 공통 스타일
+   STEP 01: 1:9 레이아웃 + 사이드바 토글
+============================================================ */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+
+/* ───── 1:9 그리드 레이아웃 ─────
+   사이드바(1) : 본문(9) = 약 220px : 나머지 */
+.app-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;   /* 1 : 9 비율 (펼침) */
+  transition: grid-template-columns .25s ease;
+}
+
+/* 사이드바 접힘 상태 → 아이콘만 표시 (전체화면에 가까움) */
+.app-grid.collapsed {
+  grid-template-columns: 64px 1fr;
+}
+/* 사이드바 완전 숨김(전체화면) 옵션 */
+.app-grid.full {
+  grid-template-columns: 0 1fr;
+}
+
+/* 접힘 시 텍스트 라벨 숨김 */
+.app-grid.collapsed .sidebar-label,
+.app-grid.full .sidebar-label { display: none; }
+.app-grid.full #sidebar { overflow: hidden; }
+
+/* ───── 사이드바 메뉴 항목 ───── */
+.nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  font-size: 14px;
+  color: #cbd5e1;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+.nav-item.active {
+  background: rgba(59,130,246,.15);
+  color: #fff;
+  border-left-color: #3b82f6;
+}
+.nav-icon { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+.nav-text { white-space: nowrap; }
+
+/* 접힘 시 메뉴 가운데 정렬 */
+.app-grid.collapsed .nav-item { justify-content: center; padding: 11px 0; }
+
+/* ───── 반응형 (태블릿/모바일) ─────
+   좁은 화면에서는 사이드바를 자동으로 아이콘 모드로 */
+@media (max-width: 768px) {
+  .app-grid { grid-template-columns: 64px 1fr; }
+  .app-grid .sidebar-label { display: none; }
+  .app-grid.full { grid-template-columns: 0 1fr; }
+}
+
+/* ───── 스크롤바 ───── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ───── 카드 공통 (이후 STEP 재사용) ───── */
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ============================================================
+   시작 화면 (아이보리 배경 + 수학 테마 + 동적 텍스트)
+============================================================ */
+#start-screen {
+  /* 파란색 → 아이보리/흰색 그라데이션 */
+  background:
+    radial-gradient(circle at 50% 30%, #ffffff 0%, #fbf9f3 45%, #f4f1e8 100%);
+}
+
+/* 떠다니는 수학 기호 배경 */
+.math-bg { position: absolute; inset: 0; pointer-events: none; }
+.m-sym {
+  position: absolute;
+  color: #1e40af;
+  opacity: .07;
+  font-weight: 800;
+  font-family: 'Times New Roman', serif;
+  animation: floatSym var(--d, 16s) ease-in-out infinite;
+  user-select: none;
+}
+@keyframes floatSym {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-26px) rotate(8deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* 로고 (수학 좌표·포물선) */
+.logo-math { display: inline-block; animation: logoFloat 5s ease-in-out infinite; }
+@keyframes logoFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-10px); }
+}
+.logo-curve {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: drawCurve 2.4s ease forwards 0.3s;
+}
+@keyframes drawCurve { to { stroke-dashoffset: 0; } }
+.logo-dot {
+  transform-origin: 60px 34px;
+  animation: dotPulse 1.6s ease-in-out infinite 2s;
+}
+@keyframes dotPulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.5); }
+}
+
+/* 상단 태그 */
+.badge-tag {
+  display: inline-block;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin-bottom: 18px;
+  opacity: 0;
+  animation: fadeUp .8s ease forwards .2s;
+}
+
+/* 메인 타이틀 — 더 크게 + 생동감 */
+.hero-title {
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  color: #1e293b;
+  margin: 0 0 18px;
+  opacity: 0;
+  animation: fadeUp .9s cubic-bezier(.2,.7,.3,1) forwards .35s;
+}
+
+/* 그라데이션 흐르는 글자 */
+.grad-text {
+  background: linear-gradient(100deg, #2563eb, #0ea5e9, #6366f1, #2563eb);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradMove 5s linear infinite;
+}
+@keyframes gradMove {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* 부제 */
+.hero-sub {
+  font-size: clamp(16px, 2.2vw, 22px);
+  color: #475569;
+  margin: 0 0 40px;
+  opacity: 0;
+  animation: fadeUp 1s ease forwards .55s;
+}
+.hero-sub strong { color: #2563eb; font-weight: 800; }
+
+/* 입장 버튼 */
+.enter-btn {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  padding: 15px 44px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(37,99,235,.32);
+  opacity: 0;
+  animation: fadeUp 1s ease forwards .75s, btnBounce 2.6s ease-in-out infinite 1.6s;
+  transition: transform .15s, box-shadow .2s;
+}
+.enter-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 18px 36px rgba(37,99,235,.42);
+}
+.enter-btn:active { transform: scale(.97); }
+.enter-btn .arrow { display: inline-block; transition: transform .2s; }
+.enter-btn:hover .arrow { transform: translateX(6px); }
+@keyframes btnBounce {
+  0%,100% { box-shadow: 0 12px 28px rgba(37,99,235,.32); }
+  50%     { box-shadow: 0 12px 38px rgba(14,165,233,.5); }
+}
+
+/* 공통 등장 애니메이션 */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 접근성: 모션 최소화 설정 시 애니메이션 해제 */
+@media (prefers-reduced-motion: reduce) {
+  .m-sym, .logo-math, .logo-dot, .grad-text, .enter-btn,
+  .badge-tag, .hero-title, .hero-sub { animation: none; opacity: 1; }
+  .logo-curve { stroke-dashoffset: 0; }
+}
+
+/* ============================================================
+   STEP 02 — 로그인 · 폼 · 버튼 · 모달
+============================================================ */
+
+/* 로그인 화면 배경 */
+#login-screen {
+  background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f3f6fc 55%, #e6edf9 100%);
+}
+
+/* 로그인 카드 */
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 32px 28px;
+  box-shadow: 0 18px 50px rgba(30, 64, 175, .12);
+  animation: fadeUp .5s ease both;
+}
+
+/* 역할 탭 (학생/교사) */
+.role-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: 12px;
+}
+.role-tab {
+  padding: 9px 0;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all .15s;
+}
+.role-tab.active {
+  background: #fff;
+  color: #1e40af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+/* 폼 요소 (공통) */
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 5px;
+}
+.form-input {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, .15);
+}
+
+/* 버튼 */
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: filter .15s, transform .1s;
+}
+.btn-primary:hover { filter: brightness(1.07); }
+.btn-primary:active { transform: scale(.98); }
+
+.btn-ghost {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-ghost:hover { background: #e2e8f0; }
+
+.btn-mini {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 9px;
+  margin-left: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-mini:hover { background: #f1f5f9; }
+
+/* 상태 배지 */
+.badge-warn {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.badge-warn:empty { display: none; }
+.badge-root {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #1e40af;
+  background: #dbeafe;
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+/* ───── 모달 ───── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 23, 42, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn .15s ease;
+}
+.modal-box {
+  width: 100%;
+  max-width: 520px;
+  max-height: 88vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .25);
+  animation: fadeUp .2s ease both;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* 설정 탭 */
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.settings-tab {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.settings-tab:hover { color: #1e40af; }
+.settings-tab.active { color: #1e40af; border-bottom-color: #2563eb; }
+
+/* 학생 목록 */
+.student-list { max-height: 320px; overflow: auto; }
+.student-list th { font-weight: 600; }

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수학 교육 통합 플랫폼</title>
+
+<!-- ===== 외부 라이브러리 (CDN, 오픈소스) ===== -->
+<!-- Tailwind CSS (MIT) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Pretendard 폰트 (오픈소스) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<!-- XLSX.js — 학생 엑셀 일괄등록/템플릿 (Apache-2.0) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- 프로젝트 스타일 -->
+<link rel="stylesheet" href="css/style.css">
+
+<script>
+  // Tailwind 사용자 설정
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+        colors: {
+          brand: { DEFAULT: '#1e40af', light: '#3b82f6', dark: '#1e3a8a' }
+        }
+      }
+    }
+  }
+</script>
+</head>
+
+<body class="font-sans bg-slate-100 text-slate-800">
+
+<!-- ============================================================
+     1) 시작 화면 (요강 필수: 보고서 제목 표시)
+============================================================ -->
+<section id="start-screen" class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+
+  <!-- 떠다니는 수학 기호 배경 (장식) -->
+  <div class="math-bg" aria-hidden="true">
+    <span class="m-sym" style="left:6%;  top:18%; --d:14s; font-size:96px;">∑</span>
+    <span class="m-sym" style="left:84%; top:12%; --d:18s; font-size:120px;">π</span>
+    <span class="m-sym" style="left:14%; top:70%; --d:16s; font-size:108px;">∫</span>
+    <span class="m-sym" style="left:78%; top:66%; --d:20s; font-size:84px;">√</span>
+    <span class="m-sym" style="left:46%; top:8%;  --d:22s; font-size:72px;">∞</span>
+    <span class="m-sym" style="left:90%; top:42%; --d:15s; font-size:64px;">θ</span>
+    <span class="m-sym" style="left:3%;  top:44%; --d:19s; font-size:80px;">Δ</span>
+    <span class="m-sym" style="left:60%; top:82%; --d:17s; font-size:90px;">x²</span>
+    <span class="m-sym" style="left:30%; top:86%; --d:21s; font-size:60px;">±</span>
+    <span class="m-sym" style="left:68%; top:30%; --d:13s; font-size:56px;">≠</span>
+  </div>
+
+  <div class="text-center px-8 max-w-3xl relative z-10">
+
+    <!-- 수학적 로고 (컴퍼스·각도 SVG, 회전 애니메이션) -->
+    <div class="logo-math mb-8">
+      <svg viewBox="0 0 120 120" width="104" height="104" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="54" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="5 7"/>
+        <!-- 좌표축 -->
+        <line x1="18" y1="92" x2="102" y2="92" stroke="#1e40af" stroke-width="3" stroke-linecap="round"/>
+        <line x1="28" y1="102" x2="28" y2="20" stroke="#1e40af" stroke-width="3" stroke-linecap="round"/>
+        <!-- 포물선 곡선 -->
+        <path d="M30 90 Q60 8 96 78" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" fill="none"
+              class="logo-curve"/>
+        <!-- 점 -->
+        <circle cx="60" cy="34" r="5" fill="#f59e0b" class="logo-dot"/>
+      </svg>
+    </div>
+
+    <p class="badge-tag">교육용 SW · AI 분과 출품작</p>
+
+    <h1 class="hero-title">
+      수학 교육 <span class="grad-text">통합 플랫폼</span>
+    </h1>
+
+    <p class="hero-sub">교사와 학생을 연결하는 <strong>AI 기반</strong> 수학 학습 생태계</p>
+
+    <button id="enter-btn" class="enter-btn">
+      입장하기 <span class="arrow">→</span>
+    </button>
+
+    <p id="fb-status" class="text-slate-400 text-xs mt-10">시스템 준비 중…</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     1-B) 로그인 화면 (교사/학생 분기)
+============================================================ -->
+<section id="login-screen" class="hidden fixed inset-0 z-40 flex items-center justify-center p-4">
+  <div class="login-card">
+    <div class="text-center mb-6">
+      <div class="text-4xl mb-2">📐</div>
+      <h2 class="text-xl font-extrabold text-slate-800">로그인</h2>
+      <p class="text-slate-500 text-sm mt-1">역할을 선택하고 로그인하세요</p>
+    </div>
+
+    <!-- 역할 탭 -->
+    <div class="role-tabs" id="role-tabs">
+      <button class="role-tab active" data-role="student">🎒 학생</button>
+      <button class="role-tab" data-role="teacher">👩‍🏫 교사</button>
+      <button class="role-tab" data-role="admin">🛡️ 관리자</button>
+    </div>
+
+    <form id="login-form" class="mt-5 space-y-3" autocomplete="off">
+      <div>
+        <label class="form-label" id="login-id-label">학년반번호</label>
+        <input id="login-id" class="form-input" inputmode="numeric"
+               placeholder="예) 10701 (1학년 7반 1번)" required>
+      </div>
+      <div>
+        <label class="form-label">비밀번호</label>
+        <input id="login-pw" type="password" class="form-input"
+               placeholder="초기 비밀번호는 본인 번호와 동일" required>
+      </div>
+
+      <p id="login-error" class="text-red-500 text-sm min-h-[1.25rem]"></p>
+
+      <button type="submit" class="btn-primary w-full">로그인</button>
+    </form>
+
+    <!-- 교사 신규 가입 (교사 탭에서만 노출) -->
+    <p id="signup-row" class="hidden text-center text-sm text-slate-500 mt-4">
+      신규 교사이신가요?
+      <button id="signup-link" type="button" class="text-brand font-semibold hover:underline">회원가입</button>
+    </p>
+
+    <p id="login-hint" class="text-center text-xs text-slate-400 mt-4">
+      학생: 아이디=학년반번호, 초기 비밀번호=아이디 · 첫 로그인 시 비밀번호 변경
+    </p>
+  </div>
+</section>
+
+<!-- 모달 루트 (비밀번호 변경 / 교사 설정 — JS가 채움) -->
+<div id="modal-root"></div>
+
+<!-- ============================================================
+     2) 메인 앱 셸 (1:9 레이아웃) — 시작 화면 이후 표시
+============================================================ -->
+<div id="app-shell" class="hidden h-screen w-screen overflow-hidden app-grid">
+
+  <!-- ───── 사이드바 (비율 1) ───── -->
+  <aside id="sidebar" class="bg-slate-900 text-slate-300 flex flex-col h-full">
+    <!-- 로고 영역 -->
+    <div class="flex items-center gap-2 px-4 h-16 border-b border-slate-700/60 shrink-0">
+      <span class="text-2xl">📐</span>
+      <span class="font-bold text-white text-sm sidebar-label">수학 플랫폼</span>
+    </div>
+
+    <!-- 메뉴 (확정 순서: 스케줄러 → 메신저 → 학습실 → 질문방 → 기타 → 포트폴리오) -->
+    <nav class="flex-1 overflow-y-auto py-3" id="nav-menu">
+      <button class="nav-item active" data-view="scheduler">
+        <span class="nav-icon">📅</span><span class="nav-text sidebar-label">스케줄러</span>
+      </button>
+      <button class="nav-item" data-view="messenger">
+        <span class="nav-icon">💬</span><span class="nav-text sidebar-label">메신저</span>
+      </button>
+      <button class="nav-item" data-view="lesson">
+        <span class="nav-icon">📚</span><span class="nav-text sidebar-label">학습실</span>
+      </button>
+      <button class="nav-item" data-view="chatbot">
+        <span class="nav-icon">🤖</span><span class="nav-text sidebar-label">질문방</span>
+      </button>
+      <button class="nav-item" data-view="etc">
+        <span class="nav-icon">🛠️</span><span class="nav-text sidebar-label">기타</span>
+      </button>
+      <button class="nav-item" data-view="portfolio">
+        <span class="nav-icon">🏆</span><span class="nav-text sidebar-label">포트폴리오</span>
+      </button>
+    </nav>
+
+    <!-- 하단 사용자 영역 -->
+    <div class="px-4 py-3 border-t border-slate-700/60 shrink-0">
+      <p id="sidebar-user" class="text-xs text-slate-300 font-semibold sidebar-label truncate">-</p>
+      <p class="text-[11px] text-slate-500 sidebar-label">v1.0 · STEP 02</p>
+    </div>
+  </aside>
+
+  <!-- ───── 본문 영역 (비율 9) ───── -->
+  <main class="flex flex-col h-full bg-slate-100 overflow-hidden">
+    <!-- 상단 헤더 -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center
+                   justify-between px-5 shrink-0">
+      <div class="flex items-center gap-3">
+        <!-- 사이드바 토글 / 전체화면 버튼 -->
+        <button id="toggle-sidebar"
+          class="w-9 h-9 grid place-items-center rounded-lg hover:bg-slate-100 text-slate-600"
+          title="사이드바 접기/펴기">
+          <span class="text-xl">☰</span>
+        </button>
+        <h2 id="view-title" class="font-bold text-lg text-slate-800">스케줄러</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- 관리자 전용: 교사 승인 · 복수 관리자 지정 -->
+        <button id="admin-btn"
+          class="hidden w-9 h-9 grid place-items-center rounded-lg hover:bg-slate-100 text-slate-600"
+          title="관리자 (교사 승인 · 관리자 지정)">
+          <span class="text-xl">🛡️</span>
+        </button>
+        <!-- 교사 전용 설정(학생등록·PW초기화·AI키) 버튼 -->
+        <button id="settings-btn"
+          class="hidden w-9 h-9 grid place-items-center rounded-lg hover:bg-slate-100 text-slate-600"
+          title="설정 (학생 관리 · AI 키)">
+          <span class="text-xl">⚙️</span>
+        </button>
+        <!-- 사용자 배지 -->
+        <div class="flex items-center gap-2 pl-1">
+          <div class="text-right leading-tight">
+            <p id="user-name" class="text-sm font-bold text-slate-700">-</p>
+            <p id="user-role" class="text-xs text-slate-400">-</p>
+          </div>
+          <div id="user-avatar"
+               class="w-9 h-9 rounded-full bg-brand text-white grid place-items-center text-sm font-bold">U</div>
+        </div>
+        <!-- 로그아웃 -->
+        <button id="logout-btn"
+          class="ml-1 px-3 h-9 rounded-lg text-sm text-slate-600 hover:bg-slate-100 border border-slate-200"
+          title="로그아웃">로그아웃</button>
+      </div>
+    </header>
+
+    <!-- 콘텐츠 (각 STEP에서 채워짐) -->
+    <section id="view-container" class="flex-1 overflow-auto p-6">
+      <!-- 라우터가 이곳에 화면을 렌더링 -->
+    </section>
+  </main>
+</div>
+
+<!-- ===== Firebase SDK (CDN, compat 버전) ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<!-- ===== 프로젝트 스크립트 ===== -->
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
