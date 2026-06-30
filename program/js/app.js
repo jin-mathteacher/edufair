@@ -12,7 +12,7 @@
     dashboard: { title: '대시보드', icon: '🏠', desc: '반별 현황 · 접속 상태 · 학습 분석', roles: ['teacher', 'student'] },
     scheduler: { title: '스케줄러', icon: '📅', desc: '달력 · 일정 · 투두리스트 (교사 → 학생 일정 공유)', roles: ['teacher', 'student'] },
     messenger: { title: '메신저',   icon: '💬', desc: '교사 ↔ 학생 실시간 1:1 채팅', roles: ['teacher', 'student'] },
-    lesson:    { title: '학습실',   icon: '📚', desc: '교과 수업 / 협업의 장 / 과제방', roles: ['teacher', 'student'] },
+    lesson:    { title: '학습실',   icon: '📚', desc: '교과 수업 / 협업의 장 / 과제방 / 자료방', roles: ['teacher', 'student'] },
     chatbot:   { title: '질문방',   icon: '🤖', desc: 'AI 수학 멘토 (소크라테스식 문답)', roles: ['teacher', 'student'] },
     etc:       { title: '기타',     icon: '🛠️', desc: '바이브코딩 / 수학그림 작성기', roles: ['teacher', 'student'] },
     portfolio: { title: '포트폴리오', icon: '🏆', desc: '학습 현황 · 뱃지 · AI 관찰 기록', roles: ['teacher', 'student'] }
@@ -243,6 +243,8 @@
       Scheduler.render(viewContainer, Auth.user);
     } else if (viewKey === 'messenger' && window.Messenger) {
       Messenger.render(viewContainer, Auth.user);
+    } else if (viewKey === 'lesson' && window.Lesson) {
+      Lesson.render(viewContainer, Auth.user);
     } else {
       viewContainer.innerHTML = renderPlaceholder(viewKey, view);
     }

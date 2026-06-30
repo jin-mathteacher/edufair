@@ -530,6 +530,9 @@
     if (filterBtn) filterBtn.classList.toggle('active', showFlaggedOnly);
     if (isTeacher && showFlaggedOnly) list = list.filter((m) => m.flagged);
 
+    // 위험 알림(kind:'alert')은 교사 전용 — 학생에게는 비표시
+    if (!isTeacher) list = list.filter((m) => m.kind !== 'alert');
+
     if (!list.length) {
       streamEl.innerHTML = `<div class="msg-stream-empty">${showFlaggedOnly
         ? '표시한 유의미 질문이 없습니다.'
@@ -543,6 +546,16 @@
       let dayDivider = '';
       const dk = dayKey(m.createdAt);
       if (dk !== lastDay) { lastDay = dk; dayDivider = `<div class="msg-day"><span>${esc(dayLabel(m.createdAt))}</span></div>`; }
+
+      // 위험 알림 (자기성찰일지 위기 신호) — 교사 전용 빨간 경고
+      if (m.kind === 'alert') {
+        return `
+        ${dayDivider}
+        <div class="msg-row theirs" data-id="${esc(m.id)}">
+          <div class="msg-bubble alert"><span class="msg-bubble-text">${esc(m.text).replace(/\n/g, '<br>')}</span></div>
+          <div class="msg-meta"><span class="msg-time">${esc(timeShort(m.createdAt))}</span></div>
+        </div>`;
+      }
 
       // 유의미 질문 표시: 교사에게만 보임 (학생 비공개)
       const showFlag = isTeacher && !mine; // 학생이 보낸 메시지에만 표시 가능
@@ -632,6 +645,31 @@
       withUid: user.uid, lastText: preview, lastAt: msg.createdAt, lastFrom: user.uid,
       unread: (cur.unread || 0) + 1
     });
+  }
+
+  /* ── 위험 알림 전송 (외부 모듈용: 자기성찰일지 위기 신호 등) ──
+     현재 사용자(학생)→교사 스레드에 kind:'alert' 메시지 기록 + 교사 inbox 만 증가.
+     학생 본인 inbox/스트림에는 노출하지 않음(renderStream에서 학생은 alert 필터). */
+  async function sendAlertTo(toUid, text) {
+    if (!user || !toUid) return false;
+    const tid = threadIdFor(user, toUid);
+    const id = genId();
+    const msg = {
+      id, from: user.uid, to: toUid,
+      text: text || '', kind: 'alert',
+      createdAt: Date.now(), read: false, flagged: false
+    };
+    try {
+      await DB.write(`messages/${tid}/${id}`, msg);
+      // 교사 inbox 만 갱신(학생 본인 inbox 미변경 → 학생에게 비노출)
+      const rPath = `inbox/${toUid}/${tid}`;
+      const cur = (await DB.read(rPath)) || { unread: 0 };
+      await DB.write(rPath, {
+        withUid: user.uid, lastText: msg.text, lastAt: msg.createdAt, lastFrom: user.uid,
+        unread: (cur.unread || 0) + 1
+      });
+      return true;
+    } catch (ex) { console.error('[messenger] 위험 알림 전송 실패', ex); return false; }
   }
 
   // 대화방 열람 → 내 안읽음 0, 상대가 보낸 메시지 read=true
@@ -809,6 +847,6 @@
   }
 
   /* 전역 노출 */
-  window.Messenger = { render, initNotifications, teardown };
+  window.Messenger = { render, initNotifications, teardown, sendAlertTo };
   console.log('[messenger] STEP 05 로드 완료 — 실시간 채팅/사진/카메라/읽음/배지/푸시알림 준비됨');
 })();

@@ -66,7 +66,7 @@ program/
 ```
 1. 📅 스케줄러   (달력·일정·투두 / 교사→학생 일정 공유)
 2. 💬 메신저
-3. 📚 학습실     (교과수업 / 협업의장 / 과제방)
+3. 📚 학습실     (교과수업 / 협업의장 / 과제방 / 자료방)
 4. 🤖 질문방     (AI 챗봇)
 5. 🛠️ 기타       (바이브코딩 / 수학그림작성기)
 6. 🏆 포트폴리오
@@ -92,7 +92,7 @@ program/
 | 03 | 대시보드(반별 현황·접속·복습퀴즈) | 데이터 로드·표시 |
 | **04** | **★스케줄러+달력+투두 (교사→학생 공유)** | 일정 보내기→학생 달력 반영 |
 | 05 | 메신저(실시간·사진·카메라·알림) | 실시간 송수신·사진 업로드 |
-| 06 | 교과수업(생성·열람·복사·동기화) | 수업 생성·복사·열람 |
+| **06** ✅ | **교과수업(생성·편집·복사·열람·실시간 발표동기화 + 자기성찰일지/위험알림)** | 수업 생성·복사·열람 |
 | 07 | 수업노트(터치필기·PDF업로드/출력) | 필기·PDF 동작 |
 | 08 | 평가(유형별·자동채점·역량레이더) | 응시·채점·차트 |
 | 09 | 과제방(제출·AI사진분석·투두연동) | 등록·알림·제출 |
@@ -190,6 +190,35 @@ program/
 3. 클라이언트: 권한 요청 → `getToken({vapidKey})` → 토큰을 `/users/{uid}/fcmTokens/{token}=true` 저장. 포그라운드 `onMessage`, 백그라운드 SW `onBackgroundMessage`.
 4. **Cloud Functions**: `messages/{threadId}/{msgId}` `onCreate` 트리거 → 수신자(`to`) 토큰 조회 → `admin.messaging().send()`. `firebase deploy --only functions`.
 5. Safari/iOS는 16.4+ & **홈화면 추가(PWA)** 필요 → `manifest.webmanifest` 권장.
+
+---
+
+## 13. 학습실 (하위 탭 컨테이너)
+
+학습실(`lesson`)은 하위 탭 컨테이너: **교과수업 | 협업의 장 | 과제방 | 자료방**(자료방이 맨 마지막). `js/lesson.js`가 셸·탭을 렌더, `app.js`가 `lesson` 라우트를 `Lesson.render`로 연결.
+
+**자료방 (구현됨)** — 교사 자료 업로드 → 학생 자동 노출·다운로드, **학생 업로드/삭제 불가**.
+- 공개 범위: **전체 학생(기본)** 또는 **특정 반 선택**(스케줄러 반 선택 UI 재사용).
+- 저장: Firebase 연결 시 **Storage** 업로드 후 URL 저장, 미연결(데모)은 dataURL 인라인(4MB 상한).
+- 구조: `/materials/{id}` = `{title,desc,fileName,mime,size,scope('all'|'class'),classIds,url,storagePath,data,uploaderUid,uploaderName,createdAt}`. `DB.subscribe('materials')` 실시간.
+
+**교과수업 (구현됨 · STEP 06)** — `js/lesson.js`의 `class` 탭. 페이지 타입: 개념설명/수업노트/유튜브/웹임베드/평가(STEP08 연결)/자기성찰일지(고정 마지막).
+- 교사: 수업 생성(반 지정→자기성찰일지 자동 포함)·편집(페이지 추가/순서/삭제)·복사(다른 반 다중)·발표/삭제. 발표 모드 → `lessons/{id}/live` 갱신.
+- 학생: 본인 반 수업만 열람. 발표중이면 `live` 구독으로 교사 페이지 자동 따라가기(해제/재개 토글). `visibilitychange` 화면이탈 경고.
+
+**자기성찰일지 (구현됨 · STEP 06)** — 교과수업 **마지막 고정 페이지**. 구조 `/reflections/{lessonId}/{studentUid}`.
+- 학생 작성 → **교사 전체 열람**(수업 카드 [성찰일지] · 읽기 전용 + 「위험 신호만」 필터).
+- **위험 감지** `scanRisk()` 키워드(high: 자살/죽고 싶/자해/사라지고 싶/살기 싫…, mid: 불안/좌절/우울/무기력/절망/외롭…) → 감지 시 `Messenger.sendAlertTo(teacherUid, text)`로 담당 교사 전원에게 **메신저 배지+푸시**(학생 비표시 빨간 경고). high면 학생에게 상담번호(자살예방 109/1393·청소년 1388) 안내.
+- ⚠️ 키워드 기반 **조기경보 보조**(오탐/미탐 가능, 전문상담 대체 아님).
+
+**보안규칙(운영 배포 시)** — UI/코드 가드에 더해 학생 쓰기 차단:
+```
+"materials": { ".read":"auth!=null",
+  "$id": { ".write":"auth!=null && root.child('users/'+auth.uid+'/role').val()==='teacher'" } },
+"reflections": { "$lid": { "$sid": {
+  ".read":  "auth!=null && (auth.uid===$sid || root.child('users/'+auth.uid+'/role').val()==='teacher')",
+  ".write": "auth!=null && auth.uid===$sid" } } }
+```
 
 ---
 > 상세 본문: `개발계획서.html` / 전체 계획: `~/.claude/plans/c-users-user-desktop-pdf-dl-snoopy-church.md`
