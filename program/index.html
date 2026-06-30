@@ -23,6 +23,10 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <!-- math.js — 평가 수식 채점·그래프 좌표 계산 (Apache-2.0) -->
 <script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.js"></script>
+<!-- KaTeX — AI 멘토/질문방 LaTeX 수식 렌더링 (MIT) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script>
   // PDF.js 워커 경로 설정 (라이브러리 로드 후)
   if (window.pdfjsLib) {
@@ -195,7 +199,7 @@
     <!-- 하단 사용자 영역 -->
     <div class="px-4 py-3 border-t border-slate-700/60 shrink-0">
       <p id="sidebar-user" class="text-xs text-slate-300 font-semibold sidebar-label truncate">-</p>
-      <p class="text-[11px] text-slate-500 sidebar-label">v1.0 · STEP 09</p>
+      <p class="text-[11px] text-slate-500 sidebar-label">v1.0 · STEP 10</p>
     </div>
   </aside>
 
@@ -263,6 +267,7 @@
 <script src="js/messenger.js"></script>
 <script src="js/assessment.js"></script>
 <script src="js/homework.js"></script>
+<script src="js/chatbot.js"></script>
 <script src="js/lesson.js"></script>
 <script src="js/app.js"></script>
 </body>

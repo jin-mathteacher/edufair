@@ -561,9 +561,16 @@
       const showFlag = isTeacher && !mine; // 학생이 보낸 메시지에만 표시 가능
       const flaggedCls = (isTeacher && m.flagged) ? 'flagged' : '';
 
-      const body = m.kind === 'image' && m.image
-        ? `<img src="${esc(m.image)}" class="msg-img" alt="사진" data-img="${esc(m.image)}">`
-        : `<span class="msg-bubble-text">${esc(m.text).replace(/\n/g, '<br>')}</span>`;
+      let body;
+      if (m.kind === 'image' && m.image) {
+        body = `<img src="${esc(m.image)}" class="msg-img" alt="사진" data-img="${esc(m.image)}">`;
+      } else {
+        // 멘토 대화 공유 링크([[SQ:id]]) → '대화 보기' 버튼으로 렌더
+        const sqm = /\[\[SQ:([A-Za-z0-9_-]+)\]\]/.exec(m.text || '');
+        const cleaned = (m.text || '').replace(/\[\[SQ:[A-Za-z0-9_-]+\]\]/g, '').trim();
+        const sqBtn = sqm ? `<button class="msg-sq-btn" data-sq="${esc(sqm[1])}">🔗 멘토 대화 보기</button>` : '';
+        body = `<span class="msg-bubble-text">${esc(cleaned).replace(/\n/g, '<br>')}</span>${sqBtn}`;
+      }
 
       const meta = `
         <span class="msg-time">${esc(timeShort(m.createdAt))}</span>
@@ -583,6 +590,10 @@
     // 이미지 확대
     streamEl.querySelectorAll('.msg-img').forEach((img) =>
       img.addEventListener('click', () => openImageViewer(img.dataset.img)));
+
+    // 멘토 대화 공유 링크 → 읽기 전용 보기
+    streamEl.querySelectorAll('.msg-sq-btn').forEach((b) =>
+      b.addEventListener('click', () => { if (window.openSharedQ) window.openSharedQ(b.dataset.sq); }));
 
     // 교사: 유의미 질문 토글
     if (isTeacher) {

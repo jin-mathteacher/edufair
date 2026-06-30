@@ -72,6 +72,7 @@
   ============================================================ */
   function showLogin() {
     if (window.Messenger) Messenger.teardown(); // 알림 구독·배지 정리
+    if (window.Chatbot) Chatbot.teardown();      // 질문방 구독 정리
     startScreen.classList.add('hidden');
     appShell.classList.add('hidden');
     loginScreen.classList.remove('hidden');
@@ -245,6 +246,8 @@
       Messenger.render(viewContainer, Auth.user);
     } else if (viewKey === 'lesson' && window.Lesson) {
       Lesson.render(viewContainer, Auth.user);
+    } else if (viewKey === 'chatbot' && window.Chatbot) {
+      Chatbot.render(viewContainer, Auth.user);
     } else {
       viewContainer.innerHTML = renderPlaceholder(viewKey, view);
     }

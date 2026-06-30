@@ -1203,3 +1203,151 @@ html, body { margin: 0; height: 100%; }
 /* 제출물(교사 보기) */
 .hw-atts { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
 .hw-pdf-chip { display: inline-block; font-size: 13px; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 6px 12px; text-decoration: none; }
+
+/* ============================================================
+   STEP 10 — 질문방 (AI 챗봇)
+============================================================ */
+.cb-wrap { max-width: 1100px; margin: 0 auto; }
+.cb-tabs { display: flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px; margin-bottom: 14px; }
+.cb-tab { padding: 9px 16px; border: none; background: transparent; border-radius: 9px; font-size: 14px; font-weight: 700; color: #64748b; cursor: pointer; }
+.cb-tab:hover { background: #f1f5f9; } .cb-tab.active { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+.cb-tabs-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.cb-newq { font-size: 13px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #16a34a, #15803d); border: none; border-radius: 999px; padding: 7px 15px; cursor: pointer; box-shadow: 0 2px 6px rgba(22,163,74,.25); }
+.cb-newq:hover { filter: brightness(1.05); }
+.cb-points { font-size: 12px; font-weight: 800; color: #b45309; background: #fef3c7; padding: 5px 12px; border-radius: 999px; }
+
+/* 멘토 */
+.cb-mentor { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: start; }
+@media (max-width: 820px) { .cb-mentor { grid-template-columns: 1fr; } }
+.cb-chars { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; }
+.cb-chars-title { font-size: 13px; font-weight: 800; color: #1e293b; margin: 0 0 8px; }
+.cb-char { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #eef2f7; border-radius: 10px; background: #fff; cursor: pointer; margin-bottom: 6px; text-align: left; }
+.cb-char:hover { background: #f8fafc; } .cb-char.active { border-color: #2563eb; background: #eff6ff; }
+.cb-char-av { width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; overflow: hidden; background: #eef4ff; border: 1.5px solid #e2e8f0; }
+.cb-char-av .cb-toon { width: 100%; height: 100%; display: block; transform: scale(1.7); transform-origin: 50% 42%; }
+.cb-char.active .cb-char-av { border-color: #2563eb; }
+.cb-char-info b { display: block; font-size: 14px; color: #1e293b; } .cb-char-info small { font-size: 11px; color: #94a3b8; }
+.cb-note { font-size: 11px; color: #94a3b8; margin: 8px 0 0; line-height: 1.5; }
+.cb-note b { color: #6d28d9; }
+
+.cb-chat { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; height: calc(100vh - 13rem); min-height: 420px; }
+.cb-empty { margin: auto; text-align: center; color: #94a3b8; font-size: 13px; padding: 24px; line-height: 1.7; }
+
+/* 만화 무대 — 살아 움직이는 일러스트 캐릭터 + 말풍선 */
+.cb-stage { position: relative; display: flex; justify-content: center; padding: 14px 16px 8px; border-bottom: 1px solid #eef2f7;
+  background: radial-gradient(120% 90% at 50% 0%, #eef4ff 0%, #fafbff 60%, #fff 100%); border-radius: 12px 12px 0 0; }
+.cb-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.cb-figure.enter { animation: cbPop .55s cubic-bezier(.2,1.4,.35,1) both; }
+.cb-toon-wrap { width: 176px; height: 186px; }
+.cb-toon { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 14px rgba(30,58,138,.16)); overflow: visible; }
+/* 부위별 애니메이션 (transform-box: fill-box 로 각 요소 자기 bbox 기준) */
+.cb-head { transform-box: fill-box; transform-origin: 50% 84%; }
+.cb-figure:not(.talking):not(.thinking) .cb-head { animation: toonSway 5s ease-in-out infinite; }
+.cb-figure.talking .cb-head { animation: toonNod .5s ease-in-out infinite; }
+.cb-figure.thinking .cb-head { animation: toonTilt 2.6s ease-in-out infinite; }
+.cb-lid { transform-box: fill-box; transform-origin: 50% 0%; transform: scaleY(0); }
+.cb-figure .cb-lid { animation: toonBlink 4.8s ease-in-out infinite; }
+.cb-mouth { transform-box: fill-box; transform-origin: 50% 50%; transform: scaleY(.16); }
+.cb-figure.talking .cb-mouth { animation: toonTalk .26s ease-in-out infinite; }
+.cb-brows { transform-box: fill-box; transform-origin: 50% 50%; }
+.cb-figure.talking .cb-brows { animation: toonBrow .5s ease-in-out infinite; }
+.cb-figure.thinking .cb-iris { transform-box: fill-box; transform-origin: 50% 50%; animation: toonLook 2.6s ease-in-out infinite; }
+/* 실제 인물(퍼블릭 도메인) 작게 + 출처 */
+.cb-portrait-cap { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 10.5px; color: #94a3b8; text-align: left; margin: 0; }
+.cb-real-mini { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; object-position: center top; border: 1.5px solid #e2e8f0; flex-shrink: 0; }
+.cb-portrait-cap a { color: #94a3b8; text-decoration: underline; }
+.cb-portrait-cap a:hover { color: #6366f1; }
+/* 말풍선(만화책 스타일) */
+.cb-speech { position: relative; max-width: 340px; min-height: 20px; background: #fff; border: 2px solid #1e293b;
+  border-radius: 16px; padding: 10px 14px; font-size: 13.5px; line-height: 1.55; color: #1e293b; font-weight: 600;
+  white-space: pre-wrap; word-break: break-word; box-shadow: 3px 3px 0 rgba(30,41,59,.12); animation: cbPop .35s ease both; }
+.cb-speech::after { content: ''; position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%);
+  border-width: 12px 9px 0; border-style: solid; border-color: #1e293b transparent transparent; }
+.cb-speech::before { content: ''; position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
+  border-width: 9px 7px 0; border-style: solid; border-color: #fff transparent transparent; z-index: 1; }
+.cb-figure.thinking .cb-speech { font-style: italic; color: #64748b; }
+@keyframes cbPop { from { opacity: 0; transform: translateY(14px) scale(.85); } to { opacity: 1; transform: translateY(0) scale(1); } }
+/* 평소: 고개를 천천히 좌우로 흔들며 끄덕 */
+@keyframes toonSway { 0%,100% { transform: rotate(-2.2deg) translateY(0); } 50% { transform: rotate(2.2deg) translateY(-2px); } }
+/* 말할 때: 빠르게 고개 까딱 */
+@keyframes toonNod { 0%,100% { transform: rotate(-1.5deg) translateY(0); } 50% { transform: rotate(1.5deg) translateY(-2px); } }
+/* 생각할 때: 크게 갸웃 */
+@keyframes toonTilt { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+/* 눈 깜빡임 — 평소에도 가끔 깜빡 */
+@keyframes toonBlink { 0%,92%,98%,100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
+/* 입 립싱크 — 열렸다 닫힘 */
+@keyframes toonTalk { 0%,100% { transform: scaleY(.16); } 45% { transform: scaleY(1); } 70% { transform: scaleY(.4); } }
+/* 말할 때 눈썹 살짝 올림 */
+@keyframes toonBrow { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+/* 생각할 때 눈동자 위로 굴림 */
+@keyframes toonLook { 0%,100% { transform: translate(0,0); } 50% { transform: translate(2px,-2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .cb-head, .cb-lid, .cb-mouth, .cb-brows, .cb-iris, .cb-figure, .cb-speech { animation: none !important; }
+  .cb-mouth { transform: scaleY(.5); } .cb-lid { transform: scaleY(0); }
+}
+.cb-stream { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.cb-row { max-width: 80%; }
+.cb-row.mine { align-self: flex-end; } .cb-row.bot { align-self: flex-start; }
+.cb-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.cb-bubble .katex, .cb-speech .katex, .pq-q .katex, .pq-ans .katex { font-size: 1.05em; }
+.cb-bubble .katex-display, .pq-ans .katex-display { margin: 6px 0; overflow-x: auto; overflow-y: hidden; }
+.cb-row.mine .cb-bubble { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border-top-right-radius: 5px; }
+.cb-row.bot .cb-bubble { background: #f1f5f9; color: #1e293b; border-top-left-radius: 5px; }
+.cb-typing { color: #94a3b8; font-style: italic; }
+/* 모를 때 누르는 힌트 칩 */
+.cb-quick { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px 0; }
+.cb-chip { font-size: 12px; font-weight: 700; color: #1d4ed8; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.cb-chip:hover { background: #dbeafe; }
+.cb-chip-teacher { color: #047857; background: #ecfdf5; border-color: #a7f3d0; margin-left: auto; }
+.cb-chip-teacher:hover { background: #d1fae5; }
+/* 선생님께 보낸 질문 목록(멘토 선택 아래) */
+.cb-myq-box { margin-top: 12px; border-top: 1px dashed #e2e8f0; padding-top: 10px; }
+.cb-myq-title { font-size: 12px; font-weight: 800; color: #1d4ed8; margin: 0 0 8px; }
+.cb-myq { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+.cb-myq-empty { font-size: 11px; color: #cbd5e1; margin: 0; }
+.cb-myq-item { display: block; width: 100%; text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 9px; padding: 7px 9px; cursor: pointer; }
+.cb-myq-item:hover { background: #eff6ff; border-color: #bfdbfe; }
+.cb-myq-item.active { background: #eff6ff; border-color: #2563eb; }
+.cb-myq-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 12px; color: #1e293b; line-height: 1.4; font-weight: 600; }
+.cb-myq-meta { display: block; font-size: 10.5px; color: #94a3b8; margin-top: 3px; }
+/* 메신저 공유 링크 버튼 */
+.msg-sq-btn { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: #1d4ed8; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+.msg-sq-btn:hover { background: #dbeafe; }
+/* 공유 대화 보기 모달 */
+.sq-view { max-height: 62vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 6px 2px; background: #f8fafc; border-radius: 10px; }
+.sq-view .cb-row { max-width: 88%; }
+.sq-view .cb-row.mine { align-self: flex-end; } .sq-view .cb-row.bot { align-self: flex-start; }
+.cb-graph-wrap { margin: 8px 0; }
+.cb-graph-canvas { border: 1px solid #e2e8f0; border-radius: 8px; max-width: 100%; background: #fff; }
+.cb-graph-cap { font-size: 12px; color: #64748b; margin: 3px 0 0; }
+.cb-msg-imgs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.cb-msg-img { max-width: 220px; max-height: 200px; border-radius: 10px; border: 1px solid rgba(0,0,0,.08); cursor: zoom-in; }
+.cb-row.mine .cb-msg-img { border-color: rgba(255,255,255,.35); }
+/* 첨부 미리보기 썸네일 */
+.cb-preview { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 12px; }
+.cb-preview:not(:empty) { padding: 8px 12px 0; }
+.cb-thumb { position: relative; display: inline-block; }
+.cb-thumb img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block; }
+.cb-thumb-x { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: none; background: #ef4444; color: #fff; font-size: 13px; line-height: 1; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.cb-attach-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cb-hint { font-size: 11px; color: #94a3b8; line-height: 1.5; margin: 6px 12px; }
+.cb-hint b { color: #2563eb; }
+.pq-imgs { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.pq-img { max-width: 200px; max-height: 180px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: zoom-in; }
+.cb-composer { display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px; border-top: 1px solid #e2e8f0; }
+.cb-tool { width: 38px; height: 38px; flex-shrink: 0; border-radius: 10px; background: #f1f5f9; border: none; font-size: 17px; cursor: pointer; }
+.cb-text { flex: 1; resize: none; padding: 9px 13px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 14px; font-family: inherit; outline: none; max-height: 110px; }
+.cb-text:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+.cb-send { flex-shrink: 0; height: 38px; padding: 0 18px; border: none; border-radius: 10px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-weight: 700; cursor: pointer; }
+
+/* 공개 질문 */
+.pq-list { display: flex; flex-direction: column; gap: 10px; }
+.pq-item { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; }
+.pq-q { font-size: 15px; color: #1e293b; font-weight: 600; margin: 0; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.pq-meta { font-size: 12px; color: #94a3b8; margin: 6px 0; display: flex; align-items: center; gap: 8px; }
+.pq-del { font-size: 11px; color: #ef4444; background: none; border: none; cursor: pointer; text-decoration: underline; }
+.pq-answers { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.pq-ans { font-size: 13px; color: #334155; background: #f8fafc; border-radius: 8px; padding: 8px 10px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.pq-ans.ai { background: #f5f3ff; border: 1px solid #ddd6fe; }
+.pq-ans b { color: #475569; }
+.pq-actions { display: flex; gap: 6px; }
