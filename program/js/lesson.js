@@ -933,7 +933,7 @@
               <button class="btn-mini lsn-copy">복사</button>
               <button class="btn-mini lsn-refl">성찰일지</button>
               <button class="btn-mini lsn-del text-red-500">삭제</button>
-            ` : `<button class="btn-primary btn-mini lsn-open">${live ? '🔴 참여' : '참여'}</button>`}
+            ` : `<button class="lsn-join lsn-open">${live ? '🔴 참여하기' : '▶ 참여하기'}</button>`}
           </div>
         </div>`;
     }).join('');
@@ -1259,6 +1259,7 @@
       const p = pages[idx];
       if (p.type === 'note') { openNoteEditor(idx); return; }
       if (p.type === 'concept') { openConceptEditor(idx); return; }
+      if (p.type === 'assessment') { if (window.Assess) Assess.openEditor(p, () => paint()); else toast('평가 모듈을 불러오지 못했습니다.'); return; }
       const box = openModal(`
         <h3 class="text-lg font-bold text-slate-800 mb-4">${PAGE_TYPES[p.type].icon} ${PAGE_TYPES[p.type].label} 편집</h3>
         <form id="pg-form" class="space-y-3" autocomplete="off">
@@ -1440,7 +1441,7 @@
     const q = (s) => host.querySelector(s);
     q('.viewer-close').addEventListener('click', () => closeViewer(true));
     q('#vw-prev').addEventListener('click', () => gotoPage(viewer.idx - 1, true));
-    q('#vw-next').addEventListener('click', () => gotoPage(viewer.idx + 1, true));
+    // #vw-next 동작은 paintPage에서 페이지 위치에 따라 설정(마지막=수업 종료)
     const leaveOk = q('#vw-leave-ok');
     if (leaveOk) leaveOk.addEventListener('click', () => q('#vw-leave').classList.add('hidden'));
     q('#vw-pdf').addEventListener('click', () => exportNotesPdf(viewer.lesson));
@@ -1514,11 +1515,21 @@
     const forced = user.role !== 'teacher' && v.lastLive && v.lastLive.active;
     const prev = root.querySelector('#vw-prev'), next = root.querySelector('#vw-next');
     prev.disabled = forced || v.idx === 0;
-    next.disabled = forced || v.idx === pages.length - 1;
+    // 마지막 페이지: '수업 종료'(교사·학생 공통) → 목록으로. 그 외: '다음'
+    if (v.idx === pages.length - 1) {
+      next.textContent = '■ 수업 종료';
+      next.classList.add('vw-end'); next.disabled = false;
+      next.onclick = () => closeViewer(true);
+    } else {
+      next.textContent = '다음 →';
+      next.classList.remove('vw-end'); next.disabled = forced;
+      next.onclick = () => gotoPage(v.idx + 1, true);
+    }
     const penBtn = root.querySelector('#vw-pen'); if (penBtn) { penBtn.classList.add('hidden'); penBtn.onclick = null; }
     stage.innerHTML = await pageHtml(p, v);
     if (p.type === 'note') await mountViewerNote(stage.querySelector('#note-host'), p, v);
     if (p.type === 'concept') await mountViewerConcept(stage.querySelector('#concept-host'), p, v);
+    if (p.type === 'assessment' && window.Assess) await Assess.mountViewer(stage.querySelector('#assess-host'), p, { lesson: v.lesson, user });
     if (p.type === 'reflection' && user.role !== 'teacher') bindReflection(stage, v);
     const rv = stage.querySelector('#vw-refl-view'); if (rv) rv.addEventListener('click', () => openReflections(v.lesson));
   }
@@ -1559,9 +1570,7 @@
       return `<div class="slide slide-text"><h2>${title}</h2><div id="concept-host"></div></div>`;
     }
     if (p.type === 'assessment') {
-      return `<div class="slide slide-text"><h2>${title}</h2>
-        <div class="slide-body">${esc(p.body || '').replace(/\n/g, '<br>') || '<span class="text-slate-300">내용이 없습니다.</span>'}</div>
-        <p class="slide-note">자동채점 평가 기능은 STEP 08에서 제공됩니다.</p></div>`;
+      return `<div class="slide"><h2>${title}</h2><div id="assess-host"></div></div>`;
     }
     if (p.type === 'note') {
       return `<div class="slide"><h2>${title}</h2><div id="note-host" class="note-host"></div></div>`;

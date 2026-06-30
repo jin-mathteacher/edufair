@@ -1073,6 +1073,20 @@ html, body { margin: 0; height: 100%; }
 }
 .lsn-enter:hover { filter: brightness(1.07); }
 .lsn-enter:active { transform: scale(.98); }
+
+/* 학생 '참여하기' 버튼 — 직관적 큰 버튼 */
+.lsn-join {
+  border: none; border-radius: 10px; cursor: pointer; white-space: nowrap;
+  font-size: 14px; font-weight: 800; padding: 10px 22px; color: #fff;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 4px 12px rgba(37,99,235,.28);
+  transition: filter .15s, transform .1s;
+}
+.lsn-join:hover { filter: brightness(1.07); }
+.lsn-join:active { transform: scale(.98); }
+
+/* 마지막 페이지 '수업 종료' 버튼 (빨강) */
+.viewer-nav .vw-end { background: #dc2626 !important; }
+.viewer-nav .vw-end:hover { filter: brightness(1.05); }
 @media (max-width: 720px) {
   .lsn-item.teacher { grid-template-columns: 1fr; }
   .lsn-item.teacher .lsn-actions, .lsn-item.teacher .lsn-enter { justify-self: stretch; }
@@ -1089,3 +1103,69 @@ html, body { margin: 0; height: 100%; }
 .slide-media.embed iframe { position: absolute; inset: 0; z-index: 1; background: transparent; }
 .embed-actions { margin-top: 12px; text-align: center; }
 .embed-open { text-decoration: none; display: inline-block; padding: 12px 26px; font-size: 15px; font-weight: 800; }
+
+/* ============================================================
+   STEP 08 — 평가
+============================================================ */
+/* 편집기 문항 목록 */
+.as-qlist { display: flex; flex-direction: column; gap: 6px; max-height: 44vh; overflow: auto; margin-bottom: 10px; }
+.as-qrow { display: flex; align-items: center; gap: 8px; border: 1px solid #eef2f7; border-radius: 10px; padding: 8px 10px; }
+.as-qrow-icon { font-size: 17px; flex-shrink: 0; }
+.as-qrow-main { flex: 1; min-width: 0; font-size: 13px; color: #334155; }
+.as-qrow-act { display: flex; gap: 3px; flex-shrink: 0; }
+.as-qtag { display: inline-block; font-size: 10px; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 1px 7px; border-radius: 6px; margin-left: 4px; }
+.as-qtag.comp { color: #1e40af; background: #dbeafe; }
+.as-addbar { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; padding-top: 10px; border-top: 1px dashed #e2e8f0; }
+.as-pdf-btn { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
+
+/* 편집기 보기/항목 */
+.as-choices { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; }
+.as-choice-edit { display: flex; align-items: center; gap: 6px; }
+.as-choice-txt { flex: 1; }
+.as-ord-n { width: 22px; text-align: center; font-weight: 700; color: #94a3b8; }
+.as-graph-prev, .as-graph { margin-top: 10px; }
+.as-graph-canvas, .as-graph canvas { border: 1px solid #e2e8f0; border-radius: 8px; max-width: 100%; background: #fff; }
+
+/* 응시 폼 */
+.as-form { display: flex; flex-direction: column; gap: 18px; max-width: 760px; }
+.as-q { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+.as-q-prompt { font-size: 15px; color: #1e293b; margin: 0 0 10px; line-height: 1.6; }
+.as-opts { display: flex; flex-direction: column; gap: 8px; }
+.as-opt { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #334155; cursor: pointer; }
+.as-opt:has(input:checked) { border-color: #2563eb; background: #eff6ff; }
+.as-input { font-size: 14px; }
+.as-submit-row { display: flex; align-items: center; gap: 12px; }
+.as-preview { padding-left: 18px; color: #334155; font-size: 14px; line-height: 1.9; }
+
+/* 순서(드래그) */
+.as-order { display: flex; flex-direction: column; gap: 6px; }
+.as-order-item { display: flex; align-items: center; gap: 8px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 9px 12px; background: #fff; cursor: grab; }
+.as-order-item.dragging { opacity: .5; }
+.as-drag { color: #cbd5e1; }
+.as-order-txt { flex: 1; font-size: 14px; color: #334155; }
+.as-order-btns { display: flex; gap: 2px; }
+.as-omove { border: 1px solid #e2e8f0; background: #fff; border-radius: 6px; cursor: pointer; font-size: 11px; padding: 2px 6px; }
+
+/* 결과(학생) */
+.as-result { text-align: center; padding: 8px 0; }
+.as-result-list { text-align: left; margin: 12px auto 0; max-width: 620px; display: flex; flex-direction: column; gap: 6px; }
+.as-ritem { font-size: 14px; color: #334155; }
+.as-mark { display: inline-block; width: 20px; font-weight: 800; }
+.as-mark.ok { color: #16a34a; } .as-mark.no { color: #dc2626; } .as-mark.pend, .as-mark.poll { color: #94a3b8; }
+.as-essay-fb { margin: 4px 0 0 20px; font-size: 13px; color: #475569; background: #f8fafc; border-radius: 8px; padding: 8px 10px; }
+
+/* 결과(교사) */
+.as-scroll { max-height: 280px; overflow: auto; }
+.as-item-bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+.as-item-q { flex: 1; min-width: 0; font-size: 13px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.as-item-bar .pbar { width: 140px; flex-shrink: 0; }
+
+/* 막대그래프 / 워드클라우드 */
+.as-barchart { display: flex; flex-direction: column; gap: 6px; }
+.as-bar-row { display: flex; align-items: center; gap: 8px; }
+.as-bar-label { width: 120px; flex-shrink: 0; font-size: 13px; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.as-bar { flex: 1; height: 16px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.as-bar-fill { display: block; height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border-radius: 999px; }
+.as-bar-n { width: 28px; text-align: right; font-size: 12px; font-weight: 700; color: #475569; }
+.as-wordcloud { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 8px; line-height: 1.4; }
+.as-word { color: #2563eb; font-weight: 700; }
