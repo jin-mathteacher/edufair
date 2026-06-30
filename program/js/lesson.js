@@ -170,6 +170,7 @@
     const body = rootEl.querySelector('#lesson-body');
     if (key === 'material') renderMaterials(body);
     else if (key === 'class') renderClass(body);
+    else if (key === 'homework' && window.Homework) Homework.render(body, user);
     else renderPlaceholder(body, key);
   }
 

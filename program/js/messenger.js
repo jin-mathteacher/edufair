@@ -672,6 +672,20 @@
     } catch (ex) { console.error('[messenger] 위험 알림 전송 실패', ex); return false; }
   }
 
+  /* ── 공개 알림 전송 (외부 모듈용: 과제 등록 등 교사→학생) ──
+     일반 메시지로 기록하여 학생에게 정상 표시 + 배지/푸시. */
+  async function sendNotice(toUid, text) {
+    if (!user || !toUid) return false;
+    const tid = threadIdFor(user, toUid);
+    const id = genId();
+    const msg = { id, from: user.uid, to: toUid, text: text || '', kind: 'text', createdAt: Date.now(), read: false, flagged: false };
+    try {
+      await DB.write(`messages/${tid}/${id}`, msg);
+      await bumpInbox(tid, { uid: toUid }, msg);
+      return true;
+    } catch (ex) { console.error('[messenger] 알림 전송 실패', ex); return false; }
+  }
+
   // 대화방 열람 → 내 안읽음 0, 상대가 보낸 메시지 read=true
   async function markRead(tid) {
     // inbox unread 초기화
@@ -847,6 +861,6 @@
   }
 
   /* 전역 노출 */
-  window.Messenger = { render, initNotifications, teardown, sendAlertTo };
+  window.Messenger = { render, initNotifications, teardown, sendAlertTo, sendNotice };
   console.log('[messenger] STEP 05 로드 완료 — 실시간 채팅/사진/카메라/읽음/배지/푸시알림 준비됨');
 })();
