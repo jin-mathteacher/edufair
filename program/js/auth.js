@@ -235,6 +235,35 @@
         .map(stripPw);
     },
 
+    /* ── 교사 전용: 학생 1명 즉시 등록 ──
+       { grade, classNo, studentNo, name } → loginId(학년반번호) 생성 */
+    async addStudent({ grade, classNo, studentNo, name }) {
+      requireTeacher();
+      grade = parseInt(grade, 10); classNo = parseInt(classNo, 10); studentNo = parseInt(studentNo, 10);
+      if (!grade || !classNo || !studentNo) throw new Error('학년·반·번호를 올바르게 입력하세요.');
+      const loginId = `${grade}${pad2(classNo)}${pad2(studentNo)}`;
+      const classId = `${grade}${pad2(classNo)}`;
+      const uid = makeUid('student', loginId);
+      if (await Store.getUser(uid)) throw new Error(`이미 등록된 학생 번호입니다 (${loginId}).`);
+      await Store.saveUser({
+        uid, role: 'student', loginId,
+        name: String(name || '').trim(),
+        grade, classNo, studentNo, classId,
+        pwHash: hash(loginId), mustChangePw: true, createdAt: Date.now()
+      });
+      return loginId;
+    },
+
+    /* ── 교사 전용: 학생 이름 수정 (이름 미입력 학생 보강) ── */
+    async setStudentName(uid, name) {
+      requireTeacher();
+      const u = await Store.getUser(uid);
+      if (!u || u.role !== 'student') throw new Error('학생을 찾을 수 없습니다.');
+      u.name = String(name || '').trim();
+      await Store.saveUser(u);
+      return stripPw(u);
+    },
+
     /* ── 교사 전용: 학생 일괄등록 ──
        rows: [{ grade, classNo, studentNo, name }]
        반환: { added, skipped, errors[] } */

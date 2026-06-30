@@ -421,38 +421,83 @@
     }
   }
 
-  /* ── 탭2: 학생 관리 (목록 / PW초기화 / 삭제) ── */
+  /* ── 탭2: 학생 관리 (즉시 등록 / 목록 / 이름수정 / PW초기화 / 삭제) ── */
   async function renderManageTab(body) {
     body.innerHTML = '<p class="text-slate-400 text-sm">불러오는 중…</p>';
     const students = await Auth.listStudents();
-    if (!students.length) {
-      body.innerHTML = '<p class="text-slate-400 text-sm py-8 text-center">등록된 학생이 없습니다. ‘학생 일괄등록’ 탭에서 추가하세요.</p>';
-      return;
-    }
-    body.innerHTML = `
-      <div class="text-xs text-slate-500 mb-2">총 ${students.length}명</div>
-      <div class="student-list">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-slate-400 border-b">
-              <th class="py-2">아이디</th><th>이름</th><th>반</th><th class="text-right">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${students.map((s) => `
-              <tr class="border-b border-slate-100" data-uid="${s.uid}">
-                <td class="py-2 font-mono">${s.loginId}</td>
-                <td>${s.name || '-'} ${s.mustChangePw ? '<span class="badge-warn">초기PW</span>' : ''}</td>
-                <td>${s.grade}-${s.classNo}</td>
-                <td class="text-right whitespace-nowrap">
-                  <button class="btn-mini reset-pw">PW초기화</button>
-                  <button class="btn-mini del-student text-red-500">삭제</button>
-                </td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
+
+    const addForm = `
+      <form id="add-student-form" class="add-student" autocomplete="off">
+        <div class="add-student-row">
+          <input id="as-grade" class="form-input" inputmode="numeric" placeholder="학년" required>
+          <input id="as-class" class="form-input" inputmode="numeric" placeholder="반" required>
+          <input id="as-no" class="form-input" inputmode="numeric" placeholder="번호" required>
+          <input id="as-name" class="form-input" placeholder="이름">
+          <button type="submit" class="btn-primary whitespace-nowrap">＋ 등록</button>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">아이디=학년반번호(예: 1학년 7반 1번 → 10701) · 초기 비밀번호=아이디</p>
+        <p id="as-msg" class="text-sm min-h-[1.1rem] mt-1"></p>
+      </form>`;
+
+    const listHtml = !students.length
+      ? '<p class="text-slate-400 text-sm py-6 text-center">아직 등록된 학생이 없습니다. 위에서 한 명씩 추가하거나 ‘학생 일괄등록’ 탭을 이용하세요.</p>'
+      : `
+        <div class="text-xs text-slate-500 mb-2">총 ${students.length}명</div>
+        <div class="student-list">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-slate-400 border-b">
+                <th class="py-2">아이디</th><th>이름</th><th>반</th><th class="text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((s) => `
+                <tr class="border-b border-slate-100" data-uid="${s.uid}">
+                  <td class="py-2 font-mono">${s.loginId}</td>
+                  <td>${s.name ? s.name : '<span class="text-amber-600">이름없음</span>'} ${s.mustChangePw ? '<span class="badge-warn">초기PW</span>' : ''}</td>
+                  <td>${s.grade}-${s.classNo}</td>
+                  <td class="text-right whitespace-nowrap">
+                    <button class="btn-mini edit-name">이름수정</button>
+                    <button class="btn-mini reset-pw">PW초기화</button>
+                    <button class="btn-mini del-student text-red-500">삭제</button>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+
+    body.innerHTML = addForm + listHtml;
+
+    // 단건 등록
+    const form = body.querySelector('#add-student-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = body.querySelector('#as-msg');
+      try {
+        const loginId = await Auth.addStudent({
+          grade: body.querySelector('#as-grade').value,
+          classNo: body.querySelector('#as-class').value,
+          studentNo: body.querySelector('#as-no').value,
+          name: body.querySelector('#as-name').value
+        });
+        msg.className = 'text-sm text-green-600 mt-1';
+        msg.textContent = `✅ 등록되었습니다 (아이디: ${loginId}).`;
+        renderManageTab(body);
+      } catch (ex) {
+        msg.className = 'text-sm text-red-500 mt-1';
+        msg.textContent = ex.message;
+      }
+    });
+
+    body.querySelectorAll('.edit-name').forEach((b) =>
+      b.addEventListener('click', async (e) => {
+        const tr = e.target.closest('tr');
+        const cur = tr.querySelector('td:nth-child(2)').textContent.replace('초기PW', '').trim();
+        const name = prompt('학생 이름을 입력하세요.', cur === '이름없음' ? '' : cur);
+        if (name === null) return;
+        await Auth.setStudentName(tr.dataset.uid, name);
+        renderManageTab(body);
+      }));
     body.querySelectorAll('.reset-pw').forEach((b) =>
       b.addEventListener('click', async (e) => {
         const uid = e.target.closest('tr').dataset.uid;
