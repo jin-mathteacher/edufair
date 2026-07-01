@@ -97,10 +97,10 @@ program/
 | **08** ✅ | **평가(9유형·자동채점·5대역량 레이더·서술형 AI·결과통계)** | 응시·채점·차트 |
 | **09** ✅ | **과제방(등록→메신저알림+투두 / 제출·AI사진분석 / 기한초과 경고음·배너)** | 등록·알림·제출 |
 | **10** ✅ | **질문방(수학자캐릭터·소크라테스 대화·그래프·공개질문·포인트/뱃지)** | 대화·그래프 |
-| 11 | 협업 화이트보드+게이미피케이션 | 동시편집·대전 |
-| 12 | 포트폴리오+뱃지+AI관찰기록 | 생성·PDF출력 |
-| 13 | 기타(수학그림·바이브코딩·다국어) | 각 기능 동작 |
-| 14 | 통합테스트+블라인드검수+제출준비 | 오류0·블라인드0건 |
+| **11** ✅ | **협업 화이트보드+게이미피케이션 (실시간 동시편집 보드 / 수학 대전 스피드퀴즈+포인트)** | 동시편집·대전 |
+| **12** ✅ | **포트폴리오+뱃지+AI관찰기록 (역량 레이더·html2canvas+jsPDF 출력)** | 생성·PDF출력 |
+| **13** ✅ | **기타(수학그림 작성기·바이브코딩 거북이그래픽·다국어 ko/en/zh/vi)** | 각 기능 동작 |
+| **14** 🔶 | 통합테스트+블라인드검수(통과)+제출준비(대상학년 표시·source 복사·데모시드) | 진행 |
 
 ---
 
@@ -210,6 +210,39 @@ program/
 - `🤖 AI 멘토`: 수학자 캐릭터(뉴턴·가우스·오일러, **인라인 SVG 자체 생성 — 외부 이미지/출처 없음**) 소크라테스식 대화(정답 직접제공 억제) + 그래프(`GRAPH: 식` 자동/📈 직접, math.js+canvas). 대화 `/chats/{uid}/{char}` 저장.
 - `🙋 공개 질문`: 익명(닉네임 `anonName`) 게시판 `/publicQ` + 답변/🤖 AI답변 + **포인트·뱃지**(`Auth.saveMyData({points,badges})`, 포트폴리오 STEP12와 공유될 필드).
 - 교사 Claude API 키 필요. `app.js` chatbot 라우트 연결.
+
+**협업의 장 (구현됨 · STEP 11)** — 학습실 `협업의 장` 탭(`js/collab.js`, `window.Collab`). 하위 2탭.
+- `🤝 협업 화이트보드`: 교사가 보드 생성(전체/특정 반) → 학생들이 한 캔버스에 **실시간 동시 필기**. Pointer Events 펜/지우개/색/굵기, 내 획 되돌리기·내 필기 지우기, 교사 전체 지우기. 획은 0~1 정규화 벡터로 `/collabBoards/{id}/strokes/{sid}` 저장, `onValue` 실시간 합성. 참여자 색상 칩 표시.
+- `⚔️ 배움 대전`: 교사가 대전방 생성. **문항 구성 4가지** → ① 자동 생성(난이도·개수, 5지선다, 외부 DB 미사용 = 저작권 안전) ② **교과수업 평가에서 가져오기**(자동채점 가능 문항 선택·복제) ③ **PDF 업로드 → AI 추출**(`Assess.aiGenerateQuestionsFromFile` 재사용) ④ **직접 만들기**. 어느 방식이든 **평가 편집기를 그대로 재사용**(`Assess.openEditor` + opts)해 발문·보기·정답·이미지 수정 후 저장 시 대전방 생성(`battle.buildRoom`). **문항은 평가(assessment)와 동일 포맷·동일 편집기** → 객관식·다중선택·참거짓·단답·수식·그래프·순서 등 자유 제작(서술형·즉답통계는 자동채점 불가로 제외, `Assess.GRADABLE_TYPES`). 캡처 이미지 붙여넣기(Ctrl+V) 지원.
+- 진행: 교사(시작/다음/결과발표) ↔ 학생 실시간 응답. 응시 화면은 **평가 문항 입력 UI 재사용**(`Assess.renderQuestionInput/readAnswer/gradeOne/answerText`). 정답+속도 보너스 점수, **실시간 순위판·시상대**. 종료 시 획득 점수를 **포트폴리오 포인트/뱃지**(`Auth.saveMyData`)로 환산(1회 지급). `/battles/{id}` + `/players/{uid}` 구독(라운드 변경 시에만 학생 화면 재렌더 → 입력 UI 보존).
+- ⚠ 실시간 동시편집·대전은 **Firebase 연결 시** 다기기 동작(미연결 데모는 단일 기기 즉시 반영). `lesson.js`가 `collab` 탭을 `Collab.render`로 연결, 탭/뷰 전환 시 `Collab.teardown()`로 구독·타이머 정리.
+
+**수정 묶음 (2026-07-01 · 사용자 8건)** —
+1. 시작화면 제목 **‘AI 디지털 수업 통합 플랫폼’**, 대상학년 문구 삭제, 입장 버튼 중앙(`enter-btn-center`).
+2. 배경 상징을 수학+**국어·영어·과학·사회**로 확장(`.sub-*` 색).
+3. **다국어를 헤더 🌐 버튼**으로 이동(`app.js openLangModal`, 전 사용자). `기타`의 다국어 탭 제거.
+4. **기타 › 수학 그림 생성기**로 개편: 손그림/문제 업로드·필기 → **Claude Vision이 시험용 수학 그림(SVG) 생성**(`etc.js generateFigure`, SVG 정화 후 렌더/PNG·SVG 저장).
+5. **학습실 = 과목 레이어**: 진입 시 `과목 선택` 먼저(`subjects/{id}`={name,classId,…}). 교사 과목 생성(반 지정)→선택하면 그 과목 탭. 새 수업은 `subjectId` 태그, `loadLessons`가 subjectId(레거시는 classId)로 필터. `renderShell`/`enterSubject`/`backToSubjects`.
+6. **자기평가 보고서 탭**(자료방 옆): 교사 작성+**활성화 토글**→학생 작성/제출. `selfEval/{subjectId}`, `selfEvalSub/{subjectId}/{uid}`. 항목별 1~5 자기평가+서술+총평, 교사 제출현황·상세.
+7. **포트폴리오 › 과목별 학생 세부사항(교사 전용)**: AI 관찰기록 아래. 과목 선택→생성 시 교과수업·협업·과제·자기평가·질문방 활동 수집(`gatherSubjectActivity`)→**약 400자 세특** 생성·저장(`subjectDetails/{uid}/{subjectId}`).
+
+**포트폴리오 (구현됨 · STEP 12)** — `포트폴리오` 메뉴(`js/portfolio.js`, `window.Portfolio`).
+- 학생: 본인 / 교사: 학생 선택 → 카드. 5대 핵심역량 **레이더(Chart.js)**, 포인트·**뱃지**(0/20/50/100/200), 활동 통계(접속 횟수·평가 응시/평균·배움 대전·복습퀴즈), **AI 관찰기록**(Claude, 생기부 문체, `/observations/{uid}` 저장), **PDF 출력**(html2canvas→jsPDF, 한글 보존, 여러 페이지 분할). 기존 수집 데이터(competency/points/badges/visits/assessmentResults/battles) 재사용.
+
+**기타 (구현됨 · STEP 13)** — `기타` 메뉴(`js/etc.js`, `window.Etc`). 하위 3탭.
+- `🎨 수학 그림 작성기`: 좌표축·함수그래프(math.js)·도형·펜·텍스트 → PNG 저장.
+- `🧪 바이브코딩`: 거북이 그래픽(forward/right/repeat…)+math.js 코딩 놀이터, AI 코드 도우미(Claude). `new Function` 샌드박스+반복 가드.
+- `🌐 다국어`: UI 언어 ko/en/zh/vi 전환(`js/i18n.js`, `window.I18N`). `data-i18n` 요소+#view-title MutationObserver 번역. 콘텐츠는 원문 유지.
+
+**제출 준비 (STEP 14)** — 블라인드 검수 통과(학교/성명/지역 0건). 시작화면 **대상학년 표시**. **데모 시드**: 미연결 모드에서 샘플 학생 5명(1학년 7반, 순우리말 이름·역량/포인트 포함) 자동 생성 → 첫 실행부터 탐색 가능. `program/README.md`에 실행법·테스트계정·**오픈소스 출처(서식5)** 기재. 결과 **엑셀(.xlsx) 내보내기**(평가 결과·정오표).
+
+**평가·대전 풀이/추출 보완 (STEP 11)** —
+- **문항 유형 변경**: 문항 편집기 상단 ‘문항 유형’ 셀렉트로 유형 전환(공통 필드 유지, 유형별 설정 초기화). 배움 대전 편집기는 자동채점 가능 유형(`GRADABLE_TYPES`)만 노출.
+- **PDF 자동 그림 캡처**: PDF→문항 생성 시 AI가 그림·표·도표의 `figure{page,bbox}`를 함께 반환 → `capturePdfFigures()`가 PDF.js로 해당 영역을 렌더·크롭해 `q.image`로 첨부(`aiGenerateQuestionsFromFile`, 평가·대전 공용). 베스트에포트(실패 시 건너뜀).
+- **2단 풀이 화면**: 학생 응시(평가 `as-solve`, 대전 `bt-solve`)를 **좌(문제·그림·답 입력) / 우(필기 노트)** 2단으로. 필기 노트는 `Assess.mountNotePad()`(Pointer Events 펜·지우개·색·전체지움, 태블릿 `touch-action:none`). 반응형(좁으면 세로 스택).
+- **교사 정오 확인**: 평가 결과(`openResults`)에 **학생×문항 ○/✕/– 표**(`as-grid`). 배움 대전은 응답마다 `players/{uid}/marks{qIndex:정오}` 저장 → 진행자 화면에 학생별 현재 문항 ○/✕ 칩·정답 수, 종료 화면에 전체 정오 표.
+
+**평가 보완 (STEP 11)** — ① **객관식 기본 5지선다**(`newQuestion('single')` 보기 5개, 배움 대전 자동 생성도 5지선다). ② 문항 편집기에 **캡처 이미지 첨부 필드** 추가 — 화면 캡처를 **Ctrl+V 붙여넣기** 또는 파일 선택 → 축소(JPEG, 최대 1100px) dataURL로 `q.image` 저장, 학생 응시·미리보기에 표시. ③ 재사용 헬퍼를 `window.Assess`로 노출: `openEditor(page,onDone,opts)`(opts: title·saveLabel·saveToast·types·onSaveValidate), `renderQuestionInput/readAnswer/gradeOne/answerText`, `imageFieldHtml/bindImageField/downscale/readFileAsDataURL`, `aiGenerateQuestionsFromFile`, `GRADABLE_TYPES`, `QTYPES` → 배움 대전이 평가 편집·렌더·채점을 그대로 공유.
 
 **과제방 (구현됨 · STEP 09)** — 학습실 `과제방` 탭(`js/homework.js`, `window.Homework`).
 - 교사 등록 → `/homework/{id}` 저장 + 대상 학생 **투두(`source:'homework'`) 자동추가** + **`Messenger.sendNotice`로 메신저 알림**(배지+푸시). 제출현황 실시간(사진·🚩AI의심·교사확인).
